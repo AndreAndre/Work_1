@@ -13,6 +13,7 @@ public class ApartmentsEntity {
     private Integer floor;
     private Integer houseId;
     private Double square;
+    private HousesEntity house;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -90,4 +91,17 @@ public class ApartmentsEntity {
         result = 31 * result + (square != null ? square.hashCode() : 0);
         return result;
     }
+
+    public void setHouse (HousesEntity house) {
+        this.house = house;
+    }
+
+    public HousesEntity getHouse () {
+        return house;
+    }
+
+    ApartmentsEntity(int num, int floor, HousesEntity house) {
+
+    }
+
 }

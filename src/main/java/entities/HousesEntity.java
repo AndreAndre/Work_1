@@ -2,6 +2,8 @@ package entities;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by fedyu on 04.11.2016.
@@ -13,8 +15,10 @@ public class HousesEntity {
     private String address;
     private Integer floors;
     private Date buildDate;
+    private List<ApartmentsEntity> apartmentsList;
 
     @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     public int getId() {
         return id;
@@ -76,5 +80,65 @@ public class HousesEntity {
         result = 31 * result + (floors != null ? floors.hashCode() : 0);
         result = 31 * result + (buildDate != null ? buildDate.hashCode() : 0);
         return result;
+    }
+
+    HousesEntity (String address, int floors, Date buildDate, List<ApartmentsEntity> apartmentsList) {
+        this(address, floors, buildDate);
+        this.apartmentsList = apartmentsList;
+    }
+
+    HousesEntity (String address, int floors, Date buildDate) {
+        this.address = address;
+        this.floors = floors;
+        this.buildDate = buildDate;
+    }
+
+    HousesEntity () {
+        address = "адрес не указан";
+        floors = 0;
+    }
+
+    public void addApartment (int num, int floor) {
+        ApartmentsEntity apartment = new ApartmentsEntity(num, floor, this);
+        apartmentsList.add(apartment);
+    }
+
+    public boolean removeApartment (int num){
+        for (ApartmentsEntity apartment : apartmentsList) {
+            if (apartment.getApartmentNumber() == num) {
+                apartmentsList.remove(apartment);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addApartments (List<ApartmentsEntity> list) {
+        for (ApartmentsEntity apartment : list) {
+            apartment.setHouse(this);
+            apartmentsList.add(apartment);
+        }
+    }
+
+    public boolean removeApartments (List<ApartmentsEntity> list, HousesEntity House) {
+
+        Boolean bool = false;
+        List<ApartmentsEntity> notFoundApartments = new ArrayList<ApartmentsEntity>();
+
+        for (ApartmentsEntity apartmentForRemove : list) {           //перебираем лист с квартирами на удаление,
+
+            bool = false;
+            for (ApartmentsEntity apartment : apartmentsList) {      //затем перебираем квартиры в доме, ищем нужную квартиру.
+                if (apartment.equals(apartmentForRemove)) {          //если нашли квартиру в доме, то
+                    apartmentsList.remove(apartment);                //удаляем ее из дома
+                    apartment.setHouse(null);
+                    bool = true;                                     //и говорим что все норм
+                    break;
+                }
+            }
+            if (!bool) notFoundApartments.add(apartmentForRemove);   //Если не нашли квартиру в доме, то откладываем ее.
+        }
+        if (notFoundApartments.isEmpty()) return true;
+        return false;
     }
 }
