@@ -82,18 +82,18 @@ public class HousesEntity {
         return result;
     }
 
-    HousesEntity (String address, int floors, Date buildDate, List<ApartmentsEntity> apartmentsList) {
+    public HousesEntity (String address, int floors, Date buildDate, List<ApartmentsEntity> apartmentsList) {
         this(address, floors, buildDate);
         this.apartmentsList = apartmentsList;
     }
 
-    HousesEntity (String address, int floors, Date buildDate) {
+    public HousesEntity (String address, int floors, Date buildDate) {
         this.address = address;
         this.floors = floors;
         this.buildDate = buildDate;
     }
 
-    HousesEntity () {
+    public HousesEntity () {
         address = "адрес не указан";
         floors = 0;
     }
