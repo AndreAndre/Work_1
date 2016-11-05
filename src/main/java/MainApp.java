@@ -28,6 +28,9 @@ public class MainApp {
             System.out.println("---");
         }
 
+        ApartmentsEntity newApartment = new ApartmentsEntity();
+
+
 
         System.out.println("Добавляем новый дом");
         HousesEntity house2 = new HousesEntity();
