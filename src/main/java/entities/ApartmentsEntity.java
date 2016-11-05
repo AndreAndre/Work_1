@@ -1,6 +1,7 @@
 package entities;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by fedyu on 04.11.2016.
@@ -8,12 +9,18 @@ import javax.persistence.*;
 @Entity
 @Table(name = "apartments", schema = "public", catalog = "work_v1")
 public class ApartmentsEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "house_id", nullable = false)
+    private HousesEntity house;
     private Integer id;
     private Integer apartmentNumber;
     private Integer floor;
-    private Integer houseId;
     private Double square;
-    private HousesEntity house;
+
+    @OneToMany (mappedBy = "apartments")
+    private List<PersonalAccountsEntity> personalAccountsEntities;
+
 
     public ApartmentsEntity() {
     }
@@ -50,14 +57,21 @@ public class ApartmentsEntity {
 
     //@Basic
     //@Column(name = "house_id", nullable = true)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "house_id", nullable = false)
+
     public HousesEntity getHouse() {
         return this.house;
     }
 
     public void setHouse(HousesEntity house) {
         this.house = house;
+    }
+
+    public List<PersonalAccountsEntity> getPersonalAccountsEntities() {
+        return personalAccountsEntities;
+    }
+
+    public void setPersonalAccountsEntities(List<PersonalAccountsEntity> personalAccountsEntities) {
+        this.personalAccountsEntities = personalAccountsEntities;
     }
 
     @Basic
@@ -81,7 +95,6 @@ public class ApartmentsEntity {
         if (apartmentNumber != null ? !apartmentNumber.equals(that.apartmentNumber) : that.apartmentNumber != null)
             return false;
         if (floor != null ? !floor.equals(that.floor) : that.floor != null) return false;
-        if (houseId != null ? !houseId.equals(that.houseId) : that.houseId != null) return false;
         if (square != null ? !square.equals(that.square) : that.square != null) return false;
 
         return true;
@@ -92,7 +105,6 @@ public class ApartmentsEntity {
         int result = id;
         result = 31 * result + (apartmentNumber != null ? apartmentNumber.hashCode() : 0);
         result = 31 * result + (floor != null ? floor.hashCode() : 0);
-        result = 31 * result + (houseId != null ? houseId.hashCode() : 0);
         result = 31 * result + (square != null ? square.hashCode() : 0);
         return result;
     }
@@ -100,5 +112,6 @@ public class ApartmentsEntity {
     ApartmentsEntity(int num, int floor, HousesEntity house) {
 
     }
+
 
 }

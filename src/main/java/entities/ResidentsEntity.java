@@ -2,6 +2,7 @@ package entities;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.List;
 
 /**
  * Created by fedyu on 04.11.2016.
@@ -9,6 +10,9 @@ import java.sql.Date;
 @Entity
 @Table(name = "residents", schema = "public", catalog = "work_v1")
 public class ResidentsEntity {
+    @ManyToMany()
+    private List<PersonalAccountsEntity> personalAccountsEntities;
+
     private int id;
     private String name;
     private String secondName;
@@ -87,6 +91,15 @@ public class ResidentsEntity {
         this.personalAccountId = personalAccountId;
     }
 
+
+    public List<PersonalAccountsEntity> getPersonalAccountsEntities() {
+        return personalAccountsEntities;
+    }
+
+    public void setPersonalAccountsEntities(List<PersonalAccountsEntity> personalAccountsEntities) {
+        this.personalAccountsEntities = personalAccountsEntities;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -117,4 +130,6 @@ public class ResidentsEntity {
         result = 31 * result + (personalAccountId != null ? personalAccountId.hashCode() : 0);
         return result;
     }
+
+
 }

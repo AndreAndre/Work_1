@@ -1,16 +1,23 @@
 package entities;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by fedyu on 04.11.2016.
  */
 @Entity
 @Table(name = "personal_accounts", schema = "public", catalog = "work_v1")
-public class PersonalAccountsEntity {
+    public class PersonalAccountsEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "apartment_id", nullable = false)
+    private ApartmentsEntity apartment;
     private int id;
     private String accountNumber;
     private Integer apartmentId;
+    @ManyToMany()
+    private List<ResidentsEntity> residentsEntities;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -42,6 +49,14 @@ public class PersonalAccountsEntity {
         this.apartmentId = apartmentId;
     }
 
+    public List<ResidentsEntity> getResidentsEntities() {
+        return residentsEntities;
+    }
+
+    public void setResidentsEntities(List<ResidentsEntity> residentsEntities) {
+        this.residentsEntities = residentsEntities;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -64,4 +79,6 @@ public class PersonalAccountsEntity {
         result = 31 * result + (apartmentId != null ? apartmentId.hashCode() : 0);
         return result;
     }
+
+
 }
