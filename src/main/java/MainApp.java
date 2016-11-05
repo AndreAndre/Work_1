@@ -1,8 +1,10 @@
 import database.HibernateSessionFactory;
+import entities.ApartmentsEntity;
 import entities.HousesEntity;
 import utils.HouseUtilsImpl;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by fedyu on 04.11.2016.
@@ -14,6 +16,18 @@ public class MainApp {
         //Выводим информацию о доме
         System.out.println("Выводим информацию о доме с id = 0");
         System.out.println("Адрес: " + house.getAddress() + ". Этажей: " + house.getFloors() + ". Дата постройки: " + house.getBuildDate());
+
+
+        List<ApartmentsEntity> apartments = house.getApartmentsEntity();
+        for (ApartmentsEntity apartment :
+                apartments) {
+            System.out.println("Выводим квартиры из домов");
+            System.out.println("Номер: " + apartment.getApartmentNumber());
+            System.out.println("Этаж: " + apartment.getFloor());
+            System.out.println("Площадь: " + apartment.getSquare());
+            System.out.println("---");
+        }
+
 
         System.out.println("Добавляем новый дом");
         HousesEntity house2 = new HousesEntity();

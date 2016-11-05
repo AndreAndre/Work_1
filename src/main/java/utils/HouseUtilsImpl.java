@@ -2,6 +2,7 @@ package utils;
 
 import database.HibernateSessionFactory;
 import entities.HousesEntity;
+import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
 
 import java.util.List;
@@ -38,10 +39,18 @@ public class HouseUtilsImpl implements HouseUtils{
 
         HousesEntity house = session.load(HousesEntity.class, id);
 
+        //TODO: Добавить нормальную проверку на существованеи объекта. Сейчас, даже если load Не находит по id объект в базе, то почему то house != null
         if (null != house) {
-            session.delete(house);
-            session.getTransaction().commit();
-            session.close();
+            try {
+                session.delete(house);
+                session.getTransaction().commit();
+                session.close();
+            } catch (ObjectNotFoundException e) {
+                System.out.println("Exception: " + e);
+                System.out.println("Объекта, который вы пытаетесь удалить - не существует.");
+            }
+        } else {
+
         }
 
 

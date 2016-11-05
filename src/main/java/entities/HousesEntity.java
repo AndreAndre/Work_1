@@ -17,8 +17,6 @@ public class HousesEntity {
     private String address;
     private Integer floors;
     private Date buildDate;
-    @Deprecated
-    private List<ApartmentsEntity> apartmentsList; //Устаревшее
     private List<ApartmentsEntity> apartmentsEntity; //Новый список квартир в соответствии с Hibernate
 
     @Id
@@ -88,7 +86,7 @@ public class HousesEntity {
 
     public HousesEntity (String address, int floors, Date buildDate, List<ApartmentsEntity> apartmentsList) {
         this(address, floors, buildDate);
-        this.setApartmentsList(apartmentsList);
+        this.setApartmentsEntity(apartmentsList);
     }
 
     public HousesEntity (String address, int floors, Date buildDate) {
@@ -104,13 +102,14 @@ public class HousesEntity {
 
     public void addApartment (int num, int floor) {
         ApartmentsEntity apartment = new ApartmentsEntity(num, floor, this);
-        getApartmentsList().add(apartment);
+        getApartmentsEntity().add(apartment);
     }
 
+
     public boolean removeApartment (int num){
-        for (ApartmentsEntity apartment : getApartmentsList()) {
+        for (ApartmentsEntity apartment : getApartmentsEntity()) {
             if (apartment.getApartmentNumber() == num) {
-                getApartmentsList().remove(apartment);
+                getApartmentsEntity().remove(apartment);
                 return true;
             }
         }
@@ -120,9 +119,10 @@ public class HousesEntity {
     public void addApartments (List<ApartmentsEntity> list) {
         for (ApartmentsEntity apartment : list) {
             apartment.setHouse(this);
-            getApartmentsList().add(apartment);
+            getApartmentsEntity().add(apartment);
         }
     }
+
 
     public boolean removeApartments (List<ApartmentsEntity> list, HousesEntity House) {
 
@@ -132,9 +132,9 @@ public class HousesEntity {
         for (ApartmentsEntity apartmentForRemove : list) {           //перебираем лист с квартирами на удаление,
 
             bool = false;
-            for (ApartmentsEntity apartment : getApartmentsList()) {      //затем перебираем квартиры в доме, ищем нужную квартиру.
+            for (ApartmentsEntity apartment : getApartmentsEntity()) {      //затем перебираем квартиры в доме, ищем нужную квартиру.
                 if (apartment.equals(apartmentForRemove)) {          //если нашли квартиру в доме, то
-                    getApartmentsList().remove(apartment);                //удаляем ее из дома
+                    getApartmentsEntity().remove(apartment);                //удаляем ее из дома
                     apartment.setHouse(null);
                     bool = true;                                     //и говорим что все норм
                     break;
@@ -148,25 +148,8 @@ public class HousesEntity {
 
 
     /**
-     * Устаревшие методы ApartmentsList().
-     * Новые методы работают с apartmentsEntity
-     * в соответствии с требованиями Hibernate для связи 1-...
-     * @return
-     */
-    @Deprecated
-    public List<ApartmentsEntity> getApartmentsList() {
-        return apartmentsEntity;
-    }
-
-    @Deprecated
-    public void setApartmentsList(List<ApartmentsEntity> apartmentsList) {
-        this.apartmentsEntity = apartmentsList;
-    }
-
-
-    /**
      * Новые методы для работы с массивом квартир
-     * @return
+     * @return список квартир в доме
      */
     @OneToMany(mappedBy = "house")
     public List<ApartmentsEntity> getApartmentsEntity() {
