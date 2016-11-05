@@ -19,7 +19,7 @@ public class HouseUtilsImpl implements HouseUtils{
         //HibernateSessionFactory.shutdown();
     }
 
-    public void addHouse(HousesEntity house) {
+    public void addHouse(Object house) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         session.beginTransaction();
         session.save(house);
