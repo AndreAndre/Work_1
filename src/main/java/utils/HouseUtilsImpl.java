@@ -33,11 +33,18 @@ public class HouseUtilsImpl implements HouseUtils{
     }
 
     public void removeHouse(int id) {
-        HousesEntity contact = (HousesEntity) HibernateSessionFactory.getSessionFactory().openSession().load(
-                HousesEntity.class, id);
-        if (null != contact) {
-            HibernateSessionFactory.getSessionFactory().openSession().delete(contact);
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        HousesEntity house = session.load(HousesEntity.class, id);
+
+        if (null != house) {
+            session.delete(house);
+            session.getTransaction().commit();
+            session.close();
         }
+
+
         closeSession();
     }
 

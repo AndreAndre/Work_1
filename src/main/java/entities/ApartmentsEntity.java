@@ -8,12 +8,15 @@ import javax.persistence.*;
 @Entity
 @Table(name = "apartments", schema = "public", catalog = "work_v1")
 public class ApartmentsEntity {
-    private int id;
+    private Integer id;
     private Integer apartmentNumber;
     private Integer floor;
     private Integer houseId;
     private Double square;
     private HousesEntity house;
+
+    public ApartmentsEntity() {
+    }
 
     @Id
     @Column(name = "id", nullable = false)
@@ -45,14 +48,16 @@ public class ApartmentsEntity {
         this.floor = floor;
     }
 
-    @Basic
-    @Column(name = "house_id", nullable = true)
-    public Integer getHouseId() {
-        return houseId;
+    //@Basic
+    //@Column(name = "house_id", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "house_id", nullable = false)
+    public HousesEntity getHouse() {
+        return this.house;
     }
 
-    public void setHouseId(Integer houseId) {
-        this.houseId = houseId;
+    public void setHouse(HousesEntity house) {
+        this.house = house;
     }
 
     @Basic
@@ -90,14 +95,6 @@ public class ApartmentsEntity {
         result = 31 * result + (houseId != null ? houseId.hashCode() : 0);
         result = 31 * result + (square != null ? square.hashCode() : 0);
         return result;
-    }
-
-    public void setHouse (HousesEntity house) {
-        this.house = house;
-    }
-
-    public HousesEntity getHouse () {
-        return house;
     }
 
     ApartmentsEntity(int num, int floor, HousesEntity house) {

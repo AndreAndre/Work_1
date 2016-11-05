@@ -3,28 +3,32 @@ package entities;
 import javax.persistence.*;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by fedyu on 04.11.2016.
  */
 @Entity
-@Table(name = "houses", schema = "public", catalog = "work_v1")
+@Table(name = "houses", schema = "public", catalog = "work_v1", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "id")})
 public class HousesEntity {
-    private int id;
+    private Integer id;
     private String address;
     private Integer floors;
     private Date buildDate;
-    private List<ApartmentsEntity> apartmentsList;
+    @Deprecated
+    private List<ApartmentsEntity> apartmentsList; //Устаревшее
+    private List<ApartmentsEntity> apartmentsEntity; //Новый список квартир в соответствии с Hibernate
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    public int getId() {
+    @Column(name = "id", nullable = true)
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -84,7 +88,7 @@ public class HousesEntity {
 
     public HousesEntity (String address, int floors, Date buildDate, List<ApartmentsEntity> apartmentsList) {
         this(address, floors, buildDate);
-        this.apartmentsList = apartmentsList;
+        this.setApartmentsList(apartmentsList);
     }
 
     public HousesEntity (String address, int floors, Date buildDate) {
@@ -100,13 +104,13 @@ public class HousesEntity {
 
     public void addApartment (int num, int floor) {
         ApartmentsEntity apartment = new ApartmentsEntity(num, floor, this);
-        apartmentsList.add(apartment);
+        getApartmentsList().add(apartment);
     }
 
     public boolean removeApartment (int num){
-        for (ApartmentsEntity apartment : apartmentsList) {
+        for (ApartmentsEntity apartment : getApartmentsList()) {
             if (apartment.getApartmentNumber() == num) {
-                apartmentsList.remove(apartment);
+                getApartmentsList().remove(apartment);
                 return true;
             }
         }
@@ -116,7 +120,7 @@ public class HousesEntity {
     public void addApartments (List<ApartmentsEntity> list) {
         for (ApartmentsEntity apartment : list) {
             apartment.setHouse(this);
-            apartmentsList.add(apartment);
+            getApartmentsList().add(apartment);
         }
     }
 
@@ -128,9 +132,9 @@ public class HousesEntity {
         for (ApartmentsEntity apartmentForRemove : list) {           //перебираем лист с квартирами на удаление,
 
             bool = false;
-            for (ApartmentsEntity apartment : apartmentsList) {      //затем перебираем квартиры в доме, ищем нужную квартиру.
+            for (ApartmentsEntity apartment : getApartmentsList()) {      //затем перебираем квартиры в доме, ищем нужную квартиру.
                 if (apartment.equals(apartmentForRemove)) {          //если нашли квартиру в доме, то
-                    apartmentsList.remove(apartment);                //удаляем ее из дома
+                    getApartmentsList().remove(apartment);                //удаляем ее из дома
                     apartment.setHouse(null);
                     bool = true;                                     //и говорим что все норм
                     break;
@@ -140,5 +144,36 @@ public class HousesEntity {
         }
         if (notFoundApartments.isEmpty()) return true;
         return false;
+    }
+
+
+    /**
+     * Устаревшие методы ApartmentsList().
+     * Новые методы работают с apartmentsEntity
+     * в соответствии с требованиями Hibernate для связи 1-...
+     * @return
+     */
+    @Deprecated
+    public List<ApartmentsEntity> getApartmentsList() {
+        return apartmentsEntity;
+    }
+
+    @Deprecated
+    public void setApartmentsList(List<ApartmentsEntity> apartmentsList) {
+        this.apartmentsEntity = apartmentsList;
+    }
+
+
+    /**
+     * Новые методы для работы с массивом квартир
+     * @return
+     */
+    @OneToMany(mappedBy = "house")
+    public List<ApartmentsEntity> getApartmentsEntity() {
+        return apartmentsEntity;
+    }
+
+    public void setApartmentsEntity(List<ApartmentsEntity> apartmentsEntity) {
+        this.apartmentsEntity = apartmentsEntity;
     }
 }
