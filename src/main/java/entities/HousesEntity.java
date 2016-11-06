@@ -13,11 +13,13 @@ import java.util.List;
 @Table(name = "houses", schema = "public", catalog = "work_v1", uniqueConstraints = {
         @UniqueConstraint(columnNames = "id")})
 public class HousesEntity {
+
     private Integer id;
     private String address;
     private Integer floors;
     private Date buildDate;
-    @OneToMany(mappedBy = "house")
+
+
     private List<ApartmentsEntity> apartmentsEntity; //Новый список квартир в соответствии с Hibernate
 
     @Id
@@ -152,7 +154,7 @@ public class HousesEntity {
      * Новые методы для работы с массивом квартир
      * @return список квартир в доме
      */
-
+    @OneToMany(mappedBy = "house")
     public List<ApartmentsEntity> getApartmentsEntity() {
         return apartmentsEntity;
     }

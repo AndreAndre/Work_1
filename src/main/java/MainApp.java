@@ -1,7 +1,9 @@
 import database.HibernateSessionFactory;
 import entities.ApartmentsEntity;
 import entities.HousesEntity;
-import utils.HouseUtilsImpl;
+import entities.PersonalAccountsEntity;
+import entities.ResidentsEntity;
+import utils.EntityUtilsImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,61 +13,78 @@ import java.util.List;
  */
 public class MainApp {
     public static void main(String[] args) {
-        HouseUtilsImpl houseUtils = new HouseUtilsImpl();
-        HousesEntity house = houseUtils.getHouse(0);
+        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+
+
+        List<Object> houses = entityUtils.list(HousesEntity.class) ;
+
+        for (Object house :
+                houses) {
+            HousesEntity houseEntity = (HousesEntity) house;
+            System.out.println("Адрес: " + houseEntity.getAddress());
+        }
+
+        HousesEntity house = (HousesEntity) entityUtils.get(HousesEntity.class, 0);
         //Выводим информацию о доме
         System.out.println("Выводим информацию о доме с id = 0");
         System.out.println("Адрес: " + house.getAddress() + ". Этажей: " + house.getFloors() + ". Дата постройки: " + house.getBuildDate());
 
 
-        List<ApartmentsEntity> apartments = house.getApartmentsEntity();
-        for (ApartmentsEntity apartment :
-                apartments) {
-            System.out.println("Выводим квартиры из домов");
-            System.out.println("Номер: " + apartment.getApartmentNumber());
-            System.out.println("Этаж: " + apartment.getFloor());
-            System.out.println("Площадь: " + apartment.getSquare());
-            System.out.println("---");
-        }
+
+
 
         ApartmentsEntity newApartment = new ApartmentsEntity();
+        newApartment.setHouse(house);
+        newApartment.setFloor(4);
+        newApartment.setApartmentNumber(112);
+        newApartment.setSquare(41.2);
+
+        //entityUtils.add(newApartment);
+
+        List<ApartmentsEntity> apartments = house.getApartmentsEntity();
+
+        PersonalAccountsEntity pers = new PersonalAccountsEntity();
+        pers.setApartmentsEntity(apartments.get(1));
+        pers.setAccountNumber("А123-ОУ-77726");
+
+        ResidentsEntity resident = new ResidentsEntity();
+        resident.setName("Павлик");
+        entityUtils.add(resident);
+        pers.addResident(resident);
+
+        resident = new ResidentsEntity();
+        resident.setName("Борис");
+        entityUtils.add(resident);
+        pers.addResident(resident);
+
+        entityUtils.add(pers);
+
+        pers.addResident(resident);
 
 
+        for (ApartmentsEntity apartment :
+                apartments) {
+            System.out.println("->  Выводим квартиры из домов");
+            System.out.println("    Номер: " + apartment.getApartmentNumber());
+            System.out.println("    Этаж: " + apartment.getFloor());
+            System.out.println("    Площадь: " + apartment.getSquare());
+            System.out.println("---");
 
-        System.out.println("Добавляем новый дом");
-        HousesEntity house2 = new HousesEntity();
-        house2.setId(100);
-        house2.setAddress("ID сам не сгенерировался");
-        System.out.println("ID из house2 (0): " +house2.getId());
+            List<PersonalAccountsEntity> persAccounts = apartment.getPersonalAccountsEntity();
+            for (PersonalAccountsEntity persAccount:persAccounts) {
+                System.out.println("  ->  Лицевые счета: ");
+                System.out.println("      Номер: " + persAccount.getAccountNumber());
+                System.out.println("---");
 
-        houseUtils.addHouse(house2);
 
-        System.out.println("ID из house2: " +house2.getId());
+                List<ResidentsEntity> residents = persAccount.getResidentsEntity();
 
-        System.out.println("И ещё дом Добавляем новый дом");
-        HousesEntity house4 = new HousesEntity();
-        //house2.setId(100);
-        house4.setAddress("ID сам сгенерировался");
-        System.out.println("ID из house4 (0): " +house4.getId());
-
-        houseUtils.addHouse(house4);
-
-        System.out.println("Выводим весь список домов");
-        ArrayList<HousesEntity> houseList = (ArrayList<HousesEntity>) houseUtils.listHouse();
-        for (HousesEntity house1 :
-                houseList) {
-            System.out.println(house1.getId() + ". Адрес: " + house1.getAddress() + ". Этажей: " + house1.getFloors() + ". Дата постройки: " + house1.getBuildDate());
-        }
-
-        System.out.println("Пытаемся удалить дом");
-         houseUtils.removeHouse(3);
-
-        System.out.println("Прошли удаление, выводим список после удаления");
-            houseList = (ArrayList<HousesEntity>) houseUtils.listHouse();
-            for (HousesEntity house3 :
-                    houseList) {
-                System.out.println("Адрес: " + house3.getAddress() + ". Этажей: " + house3.getFloors() + ". Дата постройки: " + house3.getBuildDate());
+                for (ResidentsEntity resident1 : residents) {
+                    System.out.println("        --> Жильцы:");
+                    System.out.println("Name: " + resident1.getName());
+                }
             }
+        }
 
         HibernateSessionFactory.shutdown();
     }
