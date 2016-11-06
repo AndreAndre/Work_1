@@ -5,6 +5,7 @@
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
 
+<!--
 
   <servlet>
     <servlet-name>HousesView</servlet-name>
@@ -16,5 +17,5 @@
     <url-pattern>/houses</url-pattern>
   </servlet-mapping>
 
-
+-->
 </web-app>
