@@ -5,6 +5,7 @@ import utils.EntityUtilsImpl;
 import utils.TextUtils;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import java.util.List;
 /**
  * Created by fedyu on 04.11.2016.
  */
+@WebServlet("/houses")
 public class HousesView extends HttpServlet {
 
 
@@ -43,6 +45,12 @@ public class HousesView extends HttpServlet {
                 case "list":
                     printHousesTable(request, response);
                     break;
+                case "del":
+                    int paramDelete = Integer.getInteger(request.getParameter("removeId"));
+                    System.out.println("paramDelete = " + paramDelete);
+                    removeHouse(paramDelete);
+                    printHousesTable(request, response);
+                    break;
                 default:
                     printHousesTable(request, response);
                     break;
@@ -58,44 +66,40 @@ public class HousesView extends HttpServlet {
         doGet(request, response);
     }
 
-    //TODO: Исправить - выводит только один раз. После обновления страницы или повторного захода - не отображается (WTF?!)
+
     private void printHousesTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         PrintWriter htmlPage = response.getWriter();
-        htmlPage.print("<h1>Дома</h1>");
-        TextUtils.println(response,
-                "<h2>1" +
-                        "11" +
-                        "1" + "</h2>",
-                "<h3>2222</h3>",
-                "<h4>3333</h4>");
+        htmlPage.println("<h1>Дома</h1>");
 
         //Получим и выведем табличку с домами
-        EntityUtilsImpl houseUtils = new EntityUtilsImpl();
-        List<HousesEntity> houses = houseUtils.listHouse();
-        htmlPage.println("<table cellspacing=\"2\" border=\"1\" cellpadding=\"2\" width=\"960\">");
-        htmlPage.println("<tr>");
-        htmlPage.println("<td>Адрес дома</td>");
-        htmlPage.println("<td>Количество этажей</td>");
-        htmlPage.println("<td>Дата постройки</td>");
-        htmlPage.println("<td width=\"40\"></td>");
-        htmlPage.println("<td width=\"40\"></td>");
-        htmlPage.println("<td width=\"40\"></td>");
-        htmlPage.println("</tr>");
+        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+        List<HousesEntity> houses = entityUtils.listHouse();
+        TextUtils.println(response,
+            "<table cellspacing=\"2\" border=\"1\" cellpadding=\"2\" width=\"960\">",
+            "<tr>",
+            "<td>Адрес дома</td>",
+            "<td>Количество этажей</td>",
+            "<td>Дата постройки</td>",
+            "<td width=\"40\"></td>",
+            "<td width=\"40\"></td>",
+            "<td width=\"40\"></td>",
+           "</tr>");
+
         for (HousesEntity house :
                 houses) {
-            htmlPage.println("<tr>");
-            htmlPage.println("<td>"+house.getAddress()+"</td>");
-            htmlPage.println("<td>"+house.getFloors()+"</td>");
-            htmlPage.println("<td>"+house.getBuildDate()+"</td>");
-            htmlPage.println("<td><a href='#'><img src='https://cdn2.iconfinder.com/data/icons/bitsies/128/City-32.png'></a></td>");
-            htmlPage.println("<td><a href='#'><img src='https://cdn2.iconfinder.com/data/icons/bitsies/128/EditDocument-32.png'></a></td>");
-            htmlPage.println("<td><a href='#'><img src='https://cdn2.iconfinder.com/data/icons/bitsies/128/Cancel-32.png'></a></td>");
-            htmlPage.println("</tr>");
+            TextUtils.println(response,"<tr>",
+                "<td>"+house.getAddress()+"</td>",
+                "<td>"+house.getFloors()+"</td>",
+                "<td>"+house.getBuildDate()+"</td>",
+                "<td><a href='./apartments?houseId=" + house.getId() + "'><img src='https://cdn2.iconfinder.com/data/icons/bitsies/128/City-32.png'></a></td>",
+                "<td><a href='#'><img src='https://cdn2.iconfinder.com/data/icons/bitsies/128/EditDocument-32.png'></a></td>",
+                "<td><a href='?view=del&removeId=" + house.getId() + "'><img src='https://cdn2.iconfinder.com/data/icons/bitsies/128/Cancel-32.png'></a></td>",
+                "</tr>");
         }
 
         htmlPage.println("</table>");
-        htmlPage.println("<a href='#'><img src='https://cdn2.iconfinder.com/data/icons/bitsies/128/Add-32.png'>Добавить новую запись.</a> ");
+        htmlPage.println("<a href='?view=add'><img src='https://cdn2.iconfinder.com/data/icons/bitsies/128/Add-32.png'>Добавить новую запись.</a> ");
         //
 
         //Закрываем коннект к БД
@@ -104,7 +108,7 @@ public class HousesView extends HttpServlet {
 
     //TODO: Реализовать форму по добавлению нового дома в БД
     private void printAddNewHouseForm(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        EntityUtilsImpl houseUtils = new EntityUtilsImpl();
+        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
 
         PrintWriter htmlPage = response.getWriter();
         htmlPage.print("<h1>Дома</h1>");
@@ -115,7 +119,14 @@ public class HousesView extends HttpServlet {
         Date formDate = Date.valueOf("1980-01-02");
 
         HousesEntity newHouse = new HousesEntity(formAddress, formFloors, formDate);
-        houseUtils.add(newHouse);
+        entityUtils.add(newHouse);
+    }
+
+    //TODO: Удаление домов (сейчас NullPointerException)
+    private void removeHouse(int houseId) throws IOException {
+        System.out.println("remove houseId = " + houseId);
+        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+        entityUtils.remove(HousesEntity.class,houseId);
     }
 
 }
