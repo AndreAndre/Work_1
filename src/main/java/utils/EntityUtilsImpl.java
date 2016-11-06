@@ -1,10 +1,13 @@
 package utils;
 
 import database.HibernateSessionFactory;
+import entities.ApartmentsEntity;
 import entities.HousesEntity;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
+import views.HousesView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -54,10 +57,20 @@ public class EntityUtilsImpl implements EntityUtils {
         closeSession();
     }
 
+    //TODO: Не работает. Починить
     public List<Object> list(Class objClass) {
         String entityName = objClass.toString();
-        List<Object> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from " + entityName).list();
+        System.out.println("entityName " + entityName);
+        List<HousesEntity> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from HousesEntity").list();
         closeSession();
+        List<Object> obj = new ArrayList<Object>();
+        obj.add(entities);
+        return obj;
+    }
+
+    //Заглушка
+    public List<HousesEntity> listHouse() {
+        List<HousesEntity> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from HousesEntity").list();
         return entities;
     }
 }

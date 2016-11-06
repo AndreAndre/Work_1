@@ -11,6 +11,5 @@ public interface EntityUtils {
     public void add(Object house);
     public Object get(Class objClass, int id);
     public void remove(Class objClass, int id);
-    public List<Object> list(Class objClass);
-
+    public List list(Class objClass);
 }

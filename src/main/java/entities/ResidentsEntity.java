@@ -10,19 +10,16 @@ import java.util.List;
 @Entity
 @Table(name = "residents", schema = "public", catalog = "work_v1")
 public class ResidentsEntity {
-
-    //@ManyToMany()
-    //private List<PersonalAccountsEntity> personalAccountsEntities;
-
     private int id;
     private String name;
     private String secondName;
     private String lastName;
     private Date birthday;
     private Integer gender;
-    private Integer personalAccountId;
+    private List<PersonalAccountsEntity> personalAccountsEntity;
 
     @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     public int getId() {
         return id;
@@ -82,26 +79,6 @@ public class ResidentsEntity {
         this.gender = gender;
     }
 
-    @Basic
-    @Column(name = "personal_account_id", nullable = true)
-    public Integer getPersonalAccountId() {
-        return personalAccountId;
-    }
-
-    public void setPersonalAccountId(Integer personalAccountId) {
-        this.personalAccountId = personalAccountId;
-    }
-
-/*
-    public List<PersonalAccountsEntity> getPersonalAccountsEntities() {
-        return personalAccountsEntities;
-    }
-
-    public void setPersonalAccountsEntities(List<PersonalAccountsEntity> personalAccountsEntities) {
-        this.personalAccountsEntities = personalAccountsEntities;
-    }
-*/
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -115,9 +92,6 @@ public class ResidentsEntity {
         if (lastName != null ? !lastName.equals(that.lastName) : that.lastName != null) return false;
         if (birthday != null ? !birthday.equals(that.birthday) : that.birthday != null) return false;
         if (gender != null ? !gender.equals(that.gender) : that.gender != null) return false;
-        if (personalAccountId != null ? !personalAccountId.equals(that.personalAccountId) : that.personalAccountId != null)
-            return false;
-
         return true;
     }
 
@@ -129,9 +103,20 @@ public class ResidentsEntity {
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
         result = 31 * result + (birthday != null ? birthday.hashCode() : 0);
         result = 31 * result + (gender != null ? gender.hashCode() : 0);
-        result = 31 * result + (personalAccountId != null ? personalAccountId.hashCode() : 0);
         return result;
     }
 
+    @ManyToMany
+    @JoinTable(name = "resident_to_account",
+            //foreign key for CarsEntity in employee_car table
+            joinColumns = @JoinColumn(name = "resident_id"),
+            //foreign key for other side - EmployeeEntity in employee_car table
+            inverseJoinColumns = @JoinColumn(name = "account_id"))
+    public List<PersonalAccountsEntity> getPersonalAccountsEntity() {
+        return personalAccountsEntity;
+    }
 
+    public void setPersonalAccountsEntity(List<PersonalAccountsEntity> personalAccountsEntity) {
+        this.personalAccountsEntity = personalAccountsEntity;
+    }
 }

@@ -17,7 +17,7 @@ import java.util.List;
  * Created by fedyu on 04.11.2016.
  */
 public class HousesView extends HttpServlet {
-/*
+
 
     //Делаем при работе с GET-запросами
     public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -65,7 +65,9 @@ public class HousesView extends HttpServlet {
 
         //Получим и выведем табличку с домами
         EntityUtilsImpl houseUtils = new EntityUtilsImpl();
-        List<HousesEntity> houses = houseUtils.list();
+        //List<HousesEntity> houses = houseUtils.list(HousesEntity.class) ;
+        List<HousesEntity> houses = houseUtils.listHouse();
+        System.out.println("houses size: " + houses.size());
         htmlPage.println("<table cellspacing=\"2\" border=\"1\" cellpadding=\"2\" width=\"960\">");
         htmlPage.println("<tr>");
         htmlPage.println("<td>Адрес дома</td>");
@@ -110,5 +112,5 @@ public class HousesView extends HttpServlet {
         HousesEntity newHouse = new HousesEntity(formAddress, formFloors, formDate);
         houseUtils.add(newHouse);
     }
-*/
+
 }

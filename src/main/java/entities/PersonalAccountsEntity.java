@@ -1,6 +1,7 @@
 package entities;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,18 +9,16 @@ import java.util.List;
  */
 @Entity
 @Table(name = "personal_accounts", schema = "public", catalog = "work_v1")
-    public class PersonalAccountsEntity {
-
-    //@ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "apartment_id", nullable = false)
-    //private ApartmentsEntity apartment;
+public class PersonalAccountsEntity {
     private int id;
     private String accountNumber;
     private Integer apartmentId;
-    //@ManyToMany()
-    //private List<ResidentsEntity> residentsEntities;
+    private ApartmentsEntity apartmentsEntity;
+
+    private List<ResidentsEntity> residentsEntity;
 
     @Id
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     public int getId() {
         return id;
@@ -40,7 +39,7 @@ import java.util.List;
     }
 
     @Basic
-    @Column(name = "apartment_id", nullable = true)
+    @Column(name = "apartment_id", nullable = true, updatable = false, insertable = false)
     public Integer getApartmentId() {
         return apartmentId;
     }
@@ -48,15 +47,7 @@ import java.util.List;
     public void setApartmentId(Integer apartmentId) {
         this.apartmentId = apartmentId;
     }
-/*
-    public List<ResidentsEntity> getResidentsEntities() {
-        return residentsEntities;
-    }
 
-    public void setResidentsEntities(List<ResidentsEntity> residentsEntities) {
-        this.residentsEntities = residentsEntities;
-    }
-*/
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -80,5 +71,35 @@ import java.util.List;
         return result;
     }
 
+    @ManyToOne
+    @JoinColumn(name = "apartment_id", nullable = false)
+    public ApartmentsEntity getApartmentsEntity() {
+        return apartmentsEntity;
+    }
 
+    public void setApartmentsEntity(ApartmentsEntity apartmentsEntity) {
+        this.apartmentsEntity = apartmentsEntity;
+    }
+
+    @ManyToMany
+    @JoinTable(name = "resident_to_account",
+            //foreign key for CarsEntity in employee_car table
+            joinColumns = @JoinColumn(name = "account_id"),
+            //foreign key for other side - EmployeeEntity in employee_car table
+            inverseJoinColumns = @JoinColumn(name = "resident_id"))
+    public List<ResidentsEntity> getResidentsEntity() {
+        return residentsEntity;
+    }
+
+    public void setResidentsEntity(List<ResidentsEntity> residentsEntity) {
+        this.residentsEntity = residentsEntity;
+    }
+
+    public void addResident(ResidentsEntity resident) {
+        residentsEntity.add(resident);
+    }
+
+    public PersonalAccountsEntity() {
+        residentsEntity = new ArrayList<ResidentsEntity>();
+    }
 }

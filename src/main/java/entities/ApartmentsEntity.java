@@ -7,31 +7,26 @@ import java.util.List;
  * Created by fedyu on 04.11.2016.
  */
 @Entity
-@Table(name = "apartments", schema = "public", catalog = "work_v1", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "id")})
+@Table(name = "apartments", schema = "public", catalog = "work_v1")
 public class ApartmentsEntity {
-
-   private HousesEntity house;
     private Integer id;
     private Integer apartmentNumber;
     private Integer floor;
+    private Integer houseId;
     private Double square;
-
-    //@OneToMany (mappedBy = "apartments")
-    //private List<PersonalAccountsEntity> personalAccountsEntities;
-
-
+    private HousesEntity house;
+    private List<PersonalAccountsEntity> personalAccountsEntity;
     public ApartmentsEntity() {
     }
 
     @Id
-    //@GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = true)
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -66,15 +61,7 @@ public class ApartmentsEntity {
     public void setHouse(HousesEntity house) {
         this.house = house;
     }
-/*
-    public List<PersonalAccountsEntity> getPersonalAccountsEntities() {
-        return personalAccountsEntities;
-    }
 
-    public void setPersonalAccountsEntities(List<PersonalAccountsEntity> personalAccountsEntities) {
-        this.personalAccountsEntities = personalAccountsEntities;
-    }
-*/
     @Basic
     @Column(name = "square", nullable = true, precision = 0)
     public Double getSquare() {
@@ -96,6 +83,7 @@ public class ApartmentsEntity {
         if (apartmentNumber != null ? !apartmentNumber.equals(that.apartmentNumber) : that.apartmentNumber != null)
             return false;
         if (floor != null ? !floor.equals(that.floor) : that.floor != null) return false;
+        if (houseId != null ? !houseId.equals(that.houseId) : that.houseId != null) return false;
         if (square != null ? !square.equals(that.square) : that.square != null) return false;
 
         return true;
@@ -106,13 +94,21 @@ public class ApartmentsEntity {
         int result = id;
         result = 31 * result + (apartmentNumber != null ? apartmentNumber.hashCode() : 0);
         result = 31 * result + (floor != null ? floor.hashCode() : 0);
+        result = 31 * result + (houseId != null ? houseId.hashCode() : 0);
         result = 31 * result + (square != null ? square.hashCode() : 0);
         return result;
     }
 
-    public ApartmentsEntity(int num, int floor, HousesEntity house) {
+    ApartmentsEntity(int num, int floor, HousesEntity house) {
 
     }
 
+    @OneToMany(mappedBy = "apartmentsEntity")
+    public List<PersonalAccountsEntity> getPersonalAccountsEntity() {
+        return personalAccountsEntity;
+    }
 
+    public void setPersonalAccountsEntity(List<PersonalAccountsEntity> personalAccountsEntity) {
+        this.personalAccountsEntity = personalAccountsEntity;
+    }
 }
