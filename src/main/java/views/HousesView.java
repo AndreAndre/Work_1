@@ -2,6 +2,7 @@ package views;
 
 import entities.HousesEntity;
 import utils.EntityUtilsImpl;
+import utils.TextUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -70,7 +71,7 @@ public class HousesView extends HttpServlet {
                 "<h4>3333</h4>");
 
         //Получим и выведем табличку с домами
-        HouseUtilsImpl houseUtils = new HouseUtilsImpl();
+        EntityUtilsImpl houseUtils = new EntityUtilsImpl();
         List<HousesEntity> houses = houseUtils.listHouse();
         htmlPage.println("<table cellspacing=\"2\" border=\"1\" cellpadding=\"2\" width=\"960\">");
         htmlPage.println("<tr>");
@@ -103,7 +104,7 @@ public class HousesView extends HttpServlet {
 
     //TODO: Реализовать форму по добавлению нового дома в БД
     private void printAddNewHouseForm(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HouseUtilsImpl houseUtils = new HouseUtilsImpl();
+        EntityUtilsImpl houseUtils = new EntityUtilsImpl();
 
         PrintWriter htmlPage = response.getWriter();
         htmlPage.print("<h1>Дома</h1>");
@@ -114,7 +115,7 @@ public class HousesView extends HttpServlet {
         Date formDate = Date.valueOf("1980-01-02");
 
         HousesEntity newHouse = new HousesEntity(formAddress, formFloors, formDate);
-        houseUtils.addHouse(newHouse);
+        houseUtils.add(newHouse);
     }
 
 }
