@@ -7,60 +7,58 @@ import org.hibernate.Session;
 
 import java.util.List;
 
-//TODO: Сделать удаление домов
+
 /**
  * Created by fedyu on 04.11.2016.
  * Класс для служебных методов по работе с домами (добавить, удалить, обновить, считать и т.д)
  */
-public class HouseUtilsImpl implements HouseUtils{
+public class EntityUtilsImpl implements EntityUtils {
 
     private void closeSession() {
         //HibernateSessionFactory.getSessionFactory().openSession().close();
         //HibernateSessionFactory.shutdown();
     }
 
-    public void addHouse(Object house) {
+    public void add(Object entity) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         session.beginTransaction();
-        session.save(house);
+        session.save(entity);
         session.getTransaction().commit();
         closeSession();
     }
 
-    public HousesEntity getHouse(int id) {
-        HousesEntity house = (HousesEntity) HibernateSessionFactory.getSessionFactory().openSession().load(HousesEntity.class, id);
+    public Object get(Class objClass, int id) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Object entity = session.load(objClass, id);
         closeSession();
-        return house;
+        return entity;
     }
 
-    public void removeHouse(int id) {
+    public void remove(Class objClass, int id) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         session.beginTransaction();
 
-        HousesEntity house = session.load(HousesEntity.class, id);
+        Object entity = session.load(objClass, id);
 
         //TODO: Добавить нормальную проверку на существованеи объекта. Сейчас, даже если load Не находит по id объект в базе, то почему то house != null
-        if (null != house) {
+        if (null != entity) {
             try {
-                session.delete(house);
+                session.delete(entity);
                 session.getTransaction().commit();
                 session.close();
             } catch (ObjectNotFoundException e) {
                 System.out.println("Exception: " + e);
                 System.out.println("Объекта, который вы пытаетесь удалить - не существует.");
             }
-        } else {
-
         }
-
-
         closeSession();
     }
 
-    public List<HousesEntity> listHouse() {
-        List<HousesEntity> houses = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from HousesEntity").list();
+    public List<Object> list(Class objClass) {
+        String entityName = objClass.toString();
+        List<Object> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from " + entityName).list();
         closeSession();
-        return houses;
+        return entities;
     }
 }
 

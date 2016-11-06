@@ -1,10 +1,7 @@
 package views;
 
-import database.HibernateSessionFactory;
 import entities.HousesEntity;
-import org.hibernate.Session;
-import utils.HouseUtils;
-import utils.HouseUtilsImpl;
+import utils.EntityUtilsImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -21,7 +17,7 @@ import java.util.List;
  * Created by fedyu on 04.11.2016.
  */
 public class HousesView extends HttpServlet {
-
+/*
 
     //Делаем при работе с GET-запросами
     public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -68,8 +64,8 @@ public class HousesView extends HttpServlet {
         htmlPage.print("<h1>Дома</h1>");
 
         //Получим и выведем табличку с домами
-        HouseUtilsImpl houseUtils = new HouseUtilsImpl();
-        List<HousesEntity> houses = houseUtils.listHouse();
+        EntityUtilsImpl houseUtils = new EntityUtilsImpl();
+        List<HousesEntity> houses = houseUtils.list();
         htmlPage.println("<table cellspacing=\"2\" border=\"1\" cellpadding=\"2\" width=\"960\">");
         htmlPage.println("<tr>");
         htmlPage.println("<td>Адрес дома</td>");
@@ -101,7 +97,7 @@ public class HousesView extends HttpServlet {
 
     //TODO: Реализовать форму по добавлению нового дома в БД
     private void printAddNewHouseForm(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HouseUtilsImpl houseUtils = new HouseUtilsImpl();
+        EntityUtilsImpl houseUtils = new EntityUtilsImpl();
 
         PrintWriter htmlPage = response.getWriter();
         htmlPage.print("<h1>Дома</h1>");
@@ -112,7 +108,7 @@ public class HousesView extends HttpServlet {
         Date formDate = Date.valueOf("1980-01-02");
 
         HousesEntity newHouse = new HousesEntity(formAddress, formFloors, formDate);
-        houseUtils.addHouse(newHouse);
+        houseUtils.add(newHouse);
     }
-
+*/
 }

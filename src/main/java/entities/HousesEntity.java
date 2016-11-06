@@ -17,7 +17,7 @@ public class HousesEntity {
     private String address;
     private Integer floors;
     private Date buildDate;
-    @OneToMany(mappedBy = "house")
+
     private List<ApartmentsEntity> apartmentsEntity; //Новый список квартир в соответствии с Hibernate
 
     @Id
@@ -84,6 +84,7 @@ public class HousesEntity {
         result = 31 * result + (buildDate != null ? buildDate.hashCode() : 0);
         return result;
     }
+
 
     public HousesEntity (String address, int floors, Date buildDate, List<ApartmentsEntity> apartmentsList) {
         this(address, floors, buildDate);
@@ -153,6 +154,7 @@ public class HousesEntity {
      * @return список квартир в доме
      */
 
+    @OneToMany(mappedBy = "house")
     public List<ApartmentsEntity> getApartmentsEntity() {
         return apartmentsEntity;
     }

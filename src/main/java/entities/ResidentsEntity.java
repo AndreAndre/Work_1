@@ -10,8 +10,9 @@ import java.util.List;
 @Entity
 @Table(name = "residents", schema = "public", catalog = "work_v1")
 public class ResidentsEntity {
-    @ManyToMany()
-    private List<PersonalAccountsEntity> personalAccountsEntities;
+
+    //@ManyToMany()
+    //private List<PersonalAccountsEntity> personalAccountsEntities;
 
     private int id;
     private String name;
@@ -91,7 +92,7 @@ public class ResidentsEntity {
         this.personalAccountId = personalAccountId;
     }
 
-
+/*
     public List<PersonalAccountsEntity> getPersonalAccountsEntities() {
         return personalAccountsEntities;
     }
@@ -99,6 +100,7 @@ public class ResidentsEntity {
     public void setPersonalAccountsEntities(List<PersonalAccountsEntity> personalAccountsEntities) {
         this.personalAccountsEntities = personalAccountsEntities;
     }
+*/
 
     @Override
     public boolean equals(Object o) {

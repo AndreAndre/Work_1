@@ -7,26 +7,26 @@ import java.util.List;
  * Created by fedyu on 04.11.2016.
  */
 @Entity
-@Table(name = "apartments", schema = "public", catalog = "work_v1")
+@Table(name = "apartments", schema = "public", catalog = "work_v1", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "id")})
 public class ApartmentsEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "house_id", nullable = false)
-    private HousesEntity house;
+   private HousesEntity house;
     private Integer id;
     private Integer apartmentNumber;
     private Integer floor;
     private Double square;
 
-    @OneToMany (mappedBy = "apartments")
-    private List<PersonalAccountsEntity> personalAccountsEntities;
+    //@OneToMany (mappedBy = "apartments")
+    //private List<PersonalAccountsEntity> personalAccountsEntities;
 
 
     public ApartmentsEntity() {
     }
 
     @Id
-    @Column(name = "id", nullable = false)
+    //@GeneratedValue (strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = true)
     public int getId() {
         return id;
     }
@@ -57,7 +57,8 @@ public class ApartmentsEntity {
 
     //@Basic
     //@Column(name = "house_id", nullable = true)
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "house_id", nullable = false)
     public HousesEntity getHouse() {
         return this.house;
     }
@@ -65,7 +66,7 @@ public class ApartmentsEntity {
     public void setHouse(HousesEntity house) {
         this.house = house;
     }
-
+/*
     public List<PersonalAccountsEntity> getPersonalAccountsEntities() {
         return personalAccountsEntities;
     }
@@ -73,7 +74,7 @@ public class ApartmentsEntity {
     public void setPersonalAccountsEntities(List<PersonalAccountsEntity> personalAccountsEntities) {
         this.personalAccountsEntities = personalAccountsEntities;
     }
-
+*/
     @Basic
     @Column(name = "square", nullable = true, precision = 0)
     public Double getSquare() {
@@ -109,7 +110,7 @@ public class ApartmentsEntity {
         return result;
     }
 
-    ApartmentsEntity(int num, int floor, HousesEntity house) {
+    public ApartmentsEntity(int num, int floor, HousesEntity house) {
 
     }
 

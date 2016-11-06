@@ -10,14 +10,14 @@ import java.util.List;
 @Table(name = "personal_accounts", schema = "public", catalog = "work_v1")
     public class PersonalAccountsEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "apartment_id", nullable = false)
-    private ApartmentsEntity apartment;
+    //@ManyToOne(fetch = FetchType.LAZY)
+    //@JoinColumn(name = "apartment_id", nullable = false)
+    //private ApartmentsEntity apartment;
     private int id;
     private String accountNumber;
     private Integer apartmentId;
-    @ManyToMany()
-    private List<ResidentsEntity> residentsEntities;
+    //@ManyToMany()
+    //private List<ResidentsEntity> residentsEntities;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -48,7 +48,7 @@ import java.util.List;
     public void setApartmentId(Integer apartmentId) {
         this.apartmentId = apartmentId;
     }
-
+/*
     public List<ResidentsEntity> getResidentsEntities() {
         return residentsEntities;
     }
@@ -56,7 +56,7 @@ import java.util.List;
     public void setResidentsEntities(List<ResidentsEntity> residentsEntities) {
         this.residentsEntities = residentsEntities;
     }
-
+*/
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
