@@ -2,7 +2,6 @@ package views;
 
 import entities.HousesEntity;
 import utils.HouseUtilsImpl;
-import utils.TextUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -63,7 +62,7 @@ public class HousesView extends HttpServlet {
 
         PrintWriter htmlPage = response.getWriter();
         htmlPage.print("<h1>Дома</h1>");
-        TextUtils.println(response,
+        utils.TextUtils.println(response,
                 "<h2>1" +
                         "11" +
                         "1" + "</h2>",
