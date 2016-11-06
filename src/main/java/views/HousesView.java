@@ -1,10 +1,8 @@
 package views;
 
-import database.HibernateSessionFactory;
 import entities.HousesEntity;
-import org.hibernate.Session;
-import utils.HouseUtils;
 import utils.HouseUtilsImpl;
+import utils.TextUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -66,6 +63,12 @@ public class HousesView extends HttpServlet {
 
         PrintWriter htmlPage = response.getWriter();
         htmlPage.print("<h1>Дома</h1>");
+        TextUtils.println(response,
+                "<h2>1" +
+                        "11" +
+                        "1" + "</h2>",
+                "<h3>2222</h3>",
+                "<h4>3333</h4>");
 
         //Получим и выведем табличку с домами
         HouseUtilsImpl houseUtils = new HouseUtilsImpl();
