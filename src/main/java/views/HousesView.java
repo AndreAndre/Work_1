@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.sql.Date;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 //TODO: HTML тупо в лоб - не очень хорошо. Нужно подумать, как лучше генерировать страницы
@@ -26,9 +27,17 @@ public class HousesView extends HttpServlet {
     //Делаем при работе с GET-запросами
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        response.setContentType("text/html; charset=utf-8");
 
-        //Получаем список параметров и выводим на консоль (отладка)
+        //Устанавливаем кодировку на запрос/ответ
+        response.setContentType("text/html; charset=utf-8");
+        request.setCharacterEncoding("UTF-8");
+
+        TextUtils.println(response,"<html><head><title>Список домов</title>",
+            "<link rel=\"StyleSheet\" type=\"text/css\" href=\"./css/housesview/style.css\">",
+            "</head><body>");
+
+
+                //Получаем список параметров и выводим на консоль (отладка)
         Enumeration<String> params =  request.getParameterNames();
         while (params.hasMoreElements()) {
             System.out.println("Параметр " + params.nextElement());
@@ -44,10 +53,20 @@ public class HousesView extends HttpServlet {
             switch (paramView) {
                 //add - добавляем новую запись в таблицу домов
                 case "add":
+                    //Получаем параметры из запроса
                     String paramAddress = request.getParameter("address");
                     int paramFloors =  Integer.parseInt(request.getParameter("floors"));
                     Date paramBuildDate = Date.valueOf(request.getParameter("buildDate"));
+                    //Вызываем метод добавления новой записи в БД
                     addNewHouse(paramAddress, paramFloors, paramBuildDate);
+                    //Организовываем переадресацию страницы
+                    String contextPath= "./houses?view=ok";
+                    response.sendRedirect(response.encodeRedirectURL(contextPath));
+                    //printHousesTable(request, response);
+                    //printSuccessfulAddMessage(response);
+                    break;
+                //Переадресовываем сюда после добавления дома
+                case "ok":
                     printHousesTable(request, response);
                     printSuccessfulAddMessage(response);
                     break;
@@ -67,11 +86,15 @@ public class HousesView extends HttpServlet {
                     break;
             }
         }
+
+        TextUtils.println(response,
+                "</bode></html>");
     }
 
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException    {
+        //response.setContentType("text/html; charset=utf-8");
         doGet(request, response);
     }
 
@@ -112,13 +135,14 @@ public class HousesView extends HttpServlet {
         //Получим и выведем табличку с домами
         EntityUtilsImpl entityUtils = new EntityUtilsImpl();
         List<HousesEntity> houses = entityUtils.listHouse();
+        Collections.sort(houses);
         TextUtils.println(response,
             "<table cellspacing=\"2\" border=\"1\" cellpadding=\"2\" width=\"960\">",
             "<tr>",
-            "<td>Адрес дома</td>",
-            "<td>Количество этажей</td>",
-            "<td>Дата постройки</td>",
-            "<td width=\"120\"></td>",
+            "<th>Адрес дома</th>",
+            "<th>Количество этажей</th>",
+            "<th>Дата постройки</th>",
+            "<th width=\"120\">Операции</th>",
            "</tr>");
 
         for (HousesEntity house :
@@ -128,17 +152,17 @@ public class HousesView extends HttpServlet {
                 "<td>"+house.getFloors()+"</td>",
                 "<td>"+house.getBuildDate()+"</td>",
 
-                "<td><a href='./apartments?houseId=" + house.getId() + "'><img src='./images/apartments_32.png'></a>",
-                "<a href='#'><img src='./images/edit_32.png'></a>",
-                "<a href='?view=del&removeId=" + house.getId() + "'><img src='./images/remove_32.png'></a></td>",
+                "<td><a href='./apartments?houseId=" + house.getId() + "'><img src='./images/apartments_32.png' title='Список квартир' width='16px'></a>",
+                "<a href='#'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a>",
+                "<a href='?view=del&removeId=" + house.getId() + "'><img src='./images/remove_32.png' title='Удалить дом' width='16px'></a></td>",
                 "</tr>");
         }
 
 
 
         TextUtils.println(response,
-                "<form action='./houses' method=GET>",
-                "<tr height='40'>",
+                "<form action='./houses' method='POST' accept-charset=\"UTF-8\">",
+                "<tr>",
                 "<td><input type='text' placeholder='Адрес нового дома' name='address' style='width:100%; height:40px; border:0'></td>",
                 "<td><input type='number' placeholder='Этажей' min=1 name='floors' style='width:100%; height:40px; border:0'></td>",
                 "<td><input type='date' placeholder='Дата постройки' name='buildDate' style='width:100%; height:40px; border:0'></td>",
@@ -157,7 +181,7 @@ public class HousesView extends HttpServlet {
 
 
     /**
-     * Мутод получает ID-дома и удаляет его из БД
+     * Метод получает ID-дома и удаляет его из БД
      * @param houseId
      * @throws IOException
      */

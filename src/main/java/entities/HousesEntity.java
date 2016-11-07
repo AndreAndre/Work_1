@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "houses", schema = "public", catalog = "work_v1", uniqueConstraints = {
         @UniqueConstraint(columnNames = "id")})
-public class HousesEntity {
+public class HousesEntity implements Comparable{
 
     private Integer id;
     private String address;
@@ -162,4 +162,11 @@ public class HousesEntity {
     public void setApartmentsEntity(List<ApartmentsEntity> apartmentsEntity) {
         this.apartmentsEntity = apartmentsEntity;
     }
+
+    @Override
+    public int compareTo(Object o) {
+        HousesEntity tmp = (HousesEntity) o;
+        return this.getAddress().compareTo(tmp.getAddress());
+    }
+
 }
