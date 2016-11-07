@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.sql.Date;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 //TODO: HTML тупо в лоб - не очень хорошо. Нужно подумать, как лучше генерировать страницы
 //TODO: комментарии и документация к методам.
-//TODO: проблема повторной отправки данных форму при обновлении страницы
 /**
  * Created by fedyu on 04.11.2016.
  */
@@ -27,13 +27,16 @@ public class HousesView extends HttpServlet {
     //Делаем при работе с GET-запросами
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        response.setContentType("text/html; charset=utf-8");
 
-        TextUtils.println(response,"<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><title>Список домов</title>",
+        //Устанавливаем кодировку на запрос/ответ
+        response.setContentType("text/html; charset=utf-8");
+        request.setCharacterEncoding("UTF-8");
+
+        TextUtils.println(response,"<html><head><title>Список домов</title>",
             "<link rel=\"StyleSheet\" type=\"text/css\" href=\"./css/housesview/style.css\">",
             "</head><body>");
 
-        request.setCharacterEncoding("UTF-8");
+
                 //Получаем список параметров и выводим на консоль (отладка)
         Enumeration<String> params =  request.getParameterNames();
         while (params.hasMoreElements()) {
@@ -50,11 +53,20 @@ public class HousesView extends HttpServlet {
             switch (paramView) {
                 //add - добавляем новую запись в таблицу домов
                 case "add":
+                    //Получаем параметры из запроса
                     String paramAddress = request.getParameter("address");
-                    System.out.println("адрес: " + paramAddress);
                     int paramFloors =  Integer.parseInt(request.getParameter("floors"));
                     Date paramBuildDate = Date.valueOf(request.getParameter("buildDate"));
+                    //Вызываем метод добавления новой записи в БД
                     addNewHouse(paramAddress, paramFloors, paramBuildDate);
+                    //Организовываем переадресацию страницы
+                    String contextPath= "./houses?view=ok";
+                    response.sendRedirect(response.encodeRedirectURL(contextPath));
+                    //printHousesTable(request, response);
+                    //printSuccessfulAddMessage(response);
+                    break;
+                //Переадресовываем сюда после добавления дома
+                case "ok":
                     printHousesTable(request, response);
                     printSuccessfulAddMessage(response);
                     break;
@@ -123,6 +135,7 @@ public class HousesView extends HttpServlet {
         //Получим и выведем табличку с домами
         EntityUtilsImpl entityUtils = new EntityUtilsImpl();
         List<HousesEntity> houses = entityUtils.listHouse();
+        Collections.sort(houses);
         TextUtils.println(response,
             "<table cellspacing=\"2\" border=\"1\" cellpadding=\"2\" width=\"960\">",
             "<tr>",
