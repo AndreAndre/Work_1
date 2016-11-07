@@ -73,6 +73,15 @@ public class EntityUtilsImpl implements EntityUtils {
         List<HousesEntity> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from HousesEntity").list();
         return entities;
     }
+
+    /**
+     * возвращает лист со всеми квартирами
+     */
+    public static List<ApartmentsEntity> listApartments() {
+        List<ApartmentsEntity> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from ApartmentsEntity ").list();
+        return entities;
+    }
+
 }
 
 
