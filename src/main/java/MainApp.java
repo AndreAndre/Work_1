@@ -3,6 +3,7 @@ import entities.ApartmentsEntity;
 import entities.HousesEntity;
 import entities.PersonalAccountsEntity;
 import entities.ResidentsEntity;
+import utils.EntityUtils;
 import utils.EntityUtilsImpl;
 
 import java.util.ArrayList;
@@ -17,13 +18,13 @@ public class MainApp {
 
 
         List<Object> houses = entityUtils.list(HousesEntity.class) ;
-
+/*
         for (Object house :
                 houses) {
             HousesEntity houseEntity = (HousesEntity) house;
             System.out.println("Адрес: " + houseEntity.getAddress());
         }
-
+*/
         HousesEntity house = (HousesEntity) entityUtils.get(HousesEntity.class, 0);
         //Выводим информацию о доме
         System.out.println("Выводим информацию о доме с id = 0");
@@ -34,12 +35,12 @@ public class MainApp {
 
 
         ApartmentsEntity newApartment = new ApartmentsEntity();
-        newApartment.setHouse(house);
-        newApartment.setFloor(4);
-        newApartment.setApartmentNumber(112);
-        newApartment.setSquare(41.2);
-
-        //entityUtils.add(newApartment);
+        newApartment.setHouse(house); //id=0
+        newApartment.setHouseId(100);
+        newApartment.setFloor(8);
+        newApartment.setApartmentNumber(1999);
+        newApartment.setSquare(55.5);
+        entityUtils.add(newApartment);
 
         List<ApartmentsEntity> apartments = house.getApartmentsEntity();
 
