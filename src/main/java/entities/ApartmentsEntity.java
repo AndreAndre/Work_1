@@ -1,5 +1,9 @@
 package entities;
 
+import database.HibernateSessionFactory;
+import org.hibernate.Session;
+import utils.EntityUtilsImpl;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -16,8 +20,6 @@ public class ApartmentsEntity {
     private Double square;
     private HousesEntity house;
     private List<PersonalAccountsEntity> personalAccountsEntity;
-    public ApartmentsEntity() {
-    }
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
@@ -99,7 +101,27 @@ public class ApartmentsEntity {
         return result;
     }
 
+    public ApartmentsEntity() {
+    }
+
     ApartmentsEntity(int num, int floor, HousesEntity house) {
+
+    }
+
+    public ApartmentsEntity(int num, double square, int floor, HousesEntity house) {
+        this.apartmentNumber = num;
+        this.square = square;
+        this.floor = floor;
+        this.house = house;
+    }
+
+    public ApartmentsEntity(int num, double square, int floor, int houseId) {
+        this.apartmentNumber = num;
+        this.square = square;
+        this.floor = floor;
+
+        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+        this.house = (HousesEntity) entityUtils.get(HousesEntity.class, houseId);
 
     }
 

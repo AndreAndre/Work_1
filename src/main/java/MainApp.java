@@ -5,7 +5,6 @@ import entities.PersonalAccountsEntity;
 import entities.ResidentsEntity;
 import utils.EntityUtilsImpl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,16 +12,19 @@ import java.util.List;
  */
 public class MainApp {
     public static void main(String[] args) {
-        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
 
 
-        List<Object> houses = entityUtils.list(HousesEntity.class) ;
 
-        for (Object house :
-                houses) {
-            HousesEntity houseEntity = (HousesEntity) house;
-            System.out.println("Адрес: " + houseEntity.getAddress());
-        }
+
+       /* EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+        ApartmentsEntity apartment = new ApartmentsEntity(1, 1, 1, 0);
+        entityUtils.add(apartment);*/
+
+
+         EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+
+
+
 
         HousesEntity house = (HousesEntity) entityUtils.get(HousesEntity.class, 0);
         //Выводим информацию о доме
@@ -33,13 +35,10 @@ public class MainApp {
 
 
 
-        ApartmentsEntity newApartment = new ApartmentsEntity();
-        newApartment.setHouse(house);
-        newApartment.setFloor(4);
-        newApartment.setApartmentNumber(112);
-        newApartment.setSquare(41.2);
 
-        //entityUtils.add(newApartment);
+        ApartmentsEntity apartment = new ApartmentsEntity(1, 1, 1, house);
+
+        entityUtils.add(apartment);
 
         List<ApartmentsEntity> apartments = house.getApartmentsEntity();
 
@@ -61,7 +60,7 @@ public class MainApp {
 
         pers.addResident(resident);
 
-
+/*
         for (ApartmentsEntity apartment :
                 apartments) {
             System.out.println("->  Выводим квартиры из домов");
@@ -85,7 +84,7 @@ public class MainApp {
                 }
             }
         }
-
+*/
         HibernateSessionFactory.shutdown();
     }
 }

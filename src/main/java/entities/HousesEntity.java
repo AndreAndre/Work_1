@@ -1,5 +1,7 @@
 package entities;
 
+import utils.EntityUtilsImpl;
+
 import javax.persistence.*;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -105,6 +107,11 @@ public class HousesEntity implements Comparable{
 
     public void addApartment (int num, int floor) {
         ApartmentsEntity apartment = new ApartmentsEntity(num, floor, this);
+        getApartmentsEntity().add(apartment);
+    }
+
+    public void addApartment (int num, double square, int floor) {
+        ApartmentsEntity apartment = new ApartmentsEntity(num, square, floor, this);
         getApartmentsEntity().add(apartment);
     }
 
