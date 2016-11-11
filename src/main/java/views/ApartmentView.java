@@ -21,15 +21,15 @@ import static utils.TextUtils.println;
     @WebServlet ("/apartments")
 public class ApartmentView extends HttpServlet {
 
+        private HousesEntity house;
         public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
             response.setContentType("text/html; charset=utf-8");
             println(response,
                     "<html>",
                     "<head>",
                     "<title>Квартиры</title>",
+                    "<link rel=\"StyleSheet\" type=\"text/css\" href=\"./css/housesview/style.css\">",
                     "</head>");
-
-            println(response, "<h2 align='center'>Укажите ID дома или перейдите к выбору адреса. beegom.</h2>");
 
             //получаем параметры
             String paramView = request.getParameter("view");
@@ -46,14 +46,24 @@ public class ApartmentView extends HttpServlet {
                         int num = Integer.parseInt(request.getParameter("num"));
                         double square = Double.parseDouble(request.getParameter("square"));
                         int floor = Integer.parseInt(request.getParameter("floor"));
-                        int houseId = Integer.parseInt(request.getParameter("houseId"));
                         println("перед адд");
-                        addNewApartment(num, square, floor, houseId);
+                        addNewApartment(num, square, floor);
                         println("после адд");
 
-                        String contextPath= "./apartments?houseId=" + houseId;
+                        String contextPath= "./apartments?houseId=" + house.getId();
                         response.sendRedirect(response.encodeRedirectURL(contextPath));
                         println("перед брейком");
+                        break;
+
+                    case "edit":
+                        int numEdit = Integer.parseInt(request.getParameter("num"));
+                        double squareEdit = Double.parseDouble(request.getParameter("square"));
+                        int floorEdit = Integer.parseInt(request.getParameter("floor"));
+                        int apartmentId = Integer.parseInt(request.getParameter("editId"));
+
+                        editApartment(numEdit, squareEdit, floorEdit, apartmentId);
+                        String contextPathEdit= "./apartments?houseId=" + house.getId();
+                        response.sendRedirect(response.encodeRedirectURL(contextPathEdit));
                         break;
                     default:
                         printApartmentTable(request, response);
@@ -76,61 +86,29 @@ public class ApartmentView extends HttpServlet {
      */
     public void printApartmentTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-         int houseId = Integer.parseInt(request.getParameter("houseId")); //получаем ID дома
+            int houseId = Integer.parseInt(request.getParameter("houseId")); //получаем ID дома
             //берем из базы указанный дом и все его квартиры помещаем в лист apartments.
             EntityUtilsImpl entityUtils = new EntityUtilsImpl();
-            HousesEntity house = (HousesEntity) entityUtils.get(HousesEntity.class, houseId);
+            house = (HousesEntity) entityUtils.get(HousesEntity.class, houseId);
             List<ApartmentsEntity> apartments = house.getApartmentsEntity();
             //выводим ввод houseId и квартиры нужного дома
-            println(response,
-                    "<form action='./apartments' method=GET>",
-                    "<tr height='40'>",
-                    "<td><input type='number' placeholder='Введите сюда ID дома.' min=0" +
-                            " name='houseId' style='width:100%; height:40px; border:0'></td>",
-                    "<td><input type='submit' value='Ввести'></td>",
-                    "</tr>",
-                    "</form>",
-                    "<h1>Квартиры дома '" + house.getAddress() + "' </h1>",
-                    "<table cellspacing border cellpadding='2' " +
-                            "align='left' bgcolor='#eeeeee' cols='5' width='960' ",
-                    "<tr>",
-                    "<td width='350'>Адрес дома</td>",
-                    "<td width='50'>Номер квартиры</td>",
-                    "<td width='50'>Площадь</td>",
-                    "<td width='50'>Этаж</td>",
-                    "<td width='50'></td>",
-                    "</tr>");
+            printHtmlPickHouse(response);
+            println(response, "<h1>Квариры дома '" + house.getAddress() + "'</h1>");
+            printHtmlApartmentTableHead(response);  //шапка таблицы
+
             for (ApartmentsEntity apartment : apartments) {
-                println(response,
-                        "<tr>",
-                        "<td>" + house.getAddress() + "</td>",
-                        "<td>" + apartment.getApartmentNumber() + "</td>",
-                        "<td>" + apartment.getSquare() + "</td>",
-                        "<td>" + apartment.getFloor() + "</td>",
-                        "<td><a href='./personal_accounts?apartmentId=" + apartment.getId() +
-                                "'><img src='./images/document_16.png'></a></td>",
-                        "<td><a href='./residents?apartmentId=" + apartment.getId() +
-                                "'><img src='./images/peoples_16.png'></a></td>",
-                        "<td><a href='?view=edit&editId=" + apartment.getId() +
-                                "'><img src='./images/pencil_16.png'></a></td>",
-                        "</tr>");
+                int editId;
+                if(request.getParameter("editId") == null || request.getParameter("editId").isEmpty()) {
+                    printHtmlApartment(response, apartment);
+                }
+                else {
+                    editId = Integer.parseInt(request.getParameter("editId"));
+                    if (editId != apartment.getId()) printHtmlApartment(response, apartment);
+                    else printHtmlApartmentEdit(response, apartment);
+                }
             }
             //добавляем форму для добавления квартиры..
-            println(response,
-                    "<form action='./apartments' method='POST' accept-charset=\"UTF-8\">",
-                    "<tr>",
-                    "<td>Добавить квартиру в этот дом:</td>",
-                    "<td><input type='number' placeholder='Номер' min=1 name='num' " +
-                            "style='width:100%; height:40px; border:0'></td>",
-                    "<td><input type='number' placeholder='Площадь' min=1 name='square' " +
-                            "style='width:100%; height:40px; border:0'></td>",
-                    "<td><input type='number' placeholder='Этаж' min=1 name='floor' " +
-                            "style='width:100%; height:40px; border:0'></td>",
-                    "<input type='hidden' name='view' value='add'>",
-                    "<input type='hidden' name='houseId' value='" + house.getId() + "'>",
-                    "<td><input type='submit' value='Добавить квартиру в дом'></td>",
-                    "</tr>",
-                    "</form>");
+            printHtmlApartmentAdd(response);
             println(response, "</table>");
 
         }
@@ -145,59 +123,143 @@ public class ApartmentView extends HttpServlet {
     public void printApartmentOfNullHouse(HttpServletRequest request, HttpServletResponse response) throws IOException {
         println(response,
                 "<h2 align='center'>Показаны все квартиры во всех домах. Для того, чтобы увидеть квартиры определенного" +
-                        " дома, укажите ID дома или перейдите к выбору адреса. beegom, suk.</h2>",
-                "<form action='./apartments' method=GET>",
-                "<tr height='40'>",
-                "<td><input type='number' placeholder='Введите сюда ID дома.' min=0" +
-                        " name='houseId' style='width:100%; height:40px; border:0'></td>",
-                "<td><input type='submit' value='Ввести'></td>",
-                "</tr>",
-                "</form>");
+                        " дома, укажите ID дома или перейдите к выбору адреса. beegom, suk.</h2>");
+        printHtmlPickHouse(response);
 
         //таблица со всеми квартирами. Вообщее со всеми. Со всех домов.
         println(response,
-                "<h1>ВСЕ квартиры. Полностью.</h1>",
-                "<table cellspacing border cellpadding=\"2\" " +
-                "align=\"left\" bgcolor=\"#eeeeee\" cols=\"5\"  width=\"960\" ",
-                "<tr>",
-                "<td>Адрес дома</td>",
-                "<td>Номер квартиры</td>",
-                "<td>Площадь</td>",
-                "<td>Этаж</td>",
-                "<td width='20'></td>",
-                "<td width='20'></td>",
-                "<td width='20'></td>",
-                "</tr>");
+                "<h1>ВСЕ квартиры. Полностью.</h1>");
+
+        printHtmlApartmentTableHead(response);
         //создаем коллекцию и вносим в нее ВСЕ квартиры.
         List<ApartmentsEntity> apartments = new ArrayList<ApartmentsEntity>();
         apartments = EntityUtilsImpl.listApartments();
         //выводим все квартиры в таблицу
         for(ApartmentsEntity apartment : apartments){
-            println(response,
-                    "<tr>",
-                    "<td>" + apartment.getHouse().getAddress() + "</td>",
-                    "<td>" + apartment.getApartmentNumber() +"</td>",
-                    "<td>" + apartment.getSquare() + "</td>",
-                    "<td>" + apartment.getFloor() + "</td>",
-                    "<td><a href='./personal_accounts?apartmentId=" + apartment.getId() +
-                            "'><img src='./images/document_16.png'></a></td>",
-                    "<td><a href='./residents?apartmentId=" + apartment.getId() +
-                            "'><img src='./images/peoples_16.png'></a></td>",
-                    "<td><a href='?view=edit&editId=" + apartment.getId() +
-                            "'><img src='./images/pencil_16.png'></a></td>",
-                    "</tr>");
+            printHtmlApartment(response, apartment);
         }
     }
 
 
     //TODO разобраться почему не работает как надо(или как хочется)
-    public void addNewApartment(int paramNum, double paramSquare, int paramFloor, int houseId){
+    public void addNewApartment(int paramNum, double paramSquare, int paramFloor){
         EntityUtilsImpl entityUtils = new EntityUtilsImpl();
-        HousesEntity house = (HousesEntity) entityUtils.get(HousesEntity.class, houseId);
-        System.out.println("Адрес: " + house.getAddress() + ". Этажей: "                //нужный код
-                + house.getFloors() + ". Дата постройки: " + house.getBuildDate());     //не удалять
 
         ApartmentsEntity apartment = new ApartmentsEntity(paramNum, paramSquare, paramFloor, house);
         entityUtils.add(apartment);
     }
+
+    /**
+     * Метод редактирует данные о квартире
+     * @param editNum
+     * @param editSquare
+     * @param editFloor
+     * @param apartmentId
+     */
+    public void editApartment(int editNum, double editSquare, int editFloor, int apartmentId){
+        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+        ApartmentsEntity apartment = (ApartmentsEntity) entityUtils.get(ApartmentsEntity.class, apartmentId);
+
+        apartment.setApartmentNumber(editNum);
+        apartment.setSquare(editSquare);
+        apartment.setFloor(editFloor);
+    }
+
+    /**
+     * Заголовок таблицы
+     * @param response
+     * @throws IOException
+     */
+    public void printHtmlApartmentTableHead(HttpServletResponse response) throws IOException{
+        println(response,
+                "<table cellspacing border cellpadding='2' " +
+                        "align='left' bgcolor='#eeeeee' cols='5' width='960' ",
+                "<tr>",
+                "<th width='350'>Адрес дома</th>",
+                "<th width='50'>Номер квартиры</th>",
+                "<th width='50'>Площадь</th>",
+                "<th width='50'>Этаж</th>",
+                "<th width='50'></th>",
+                "</tr>");
+    }
+
+    /**
+     * Метод респонсит HTML код, который рисует простую табличную строку с данными о квартире.
+     * @param response
+     * @param apartment
+     * @throws IOException
+     */
+    public void printHtmlApartment(HttpServletResponse response, ApartmentsEntity apartment) throws IOException {
+        println(response,
+                "<tr>",
+                "<td>" + house.getAddress() + "</td>",
+                "<td>" + apartment.getApartmentNumber() + "</td>",
+                "<td>" + apartment.getSquare() + "</td>",
+                "<td>" + apartment.getFloor() + "</td>",
+                "<td><a href='./personal_accounts?apartmentId=" + apartment.getId() +
+                        "'><img src='./images/document_16.png'></a>",
+                "<a href='./residents?apartmentId=" + apartment.getId() +
+                        "'><img src='./images/peoples_16.png'></a>",
+                "<a href='?houseId=" + house.getId() + "&editId=" + apartment.getId() +
+                        "'><img src='./images/pencil_16.png'></a></td>",
+                "</tr>");
+    }
+
+    /**
+     * Респонсит HTML который рисует строку для добавления квартиры
+     * @param response
+     * @throws IOException
+     */
+    public void printHtmlApartmentAdd(HttpServletResponse response) throws IOException {
+        println(response,
+                "<form action='./apartments' method='POST' accept-charset=\"UTF-8\">",
+                "<tr>",
+                "<td>Добавить квартиру в этот дом:</td>",
+                "<td><input type='number' placeholder='Номер' min=1 name='num' " +
+                        "style='width:100%; height:40px; border:0'></td>",
+                "<td><input type='number' step=0.1 placeholder='Площадь' min=1 name='square' " +
+                        "style='width:100%; height:40px; border:0'></td>",
+                "<td><input type='number' placeholder='Этаж' min=1 name='floor' " +
+                        "style='width:100%; height:40px; border:0'></td>",
+                "<input type='hidden' name='view' value='add'>",
+                "<input type='hidden' name='houseId' value='" + house.getId() + "'>",
+                "<td><input type='submit' value='Добавить квартиру в дом'></td>",
+                "</tr>",
+                "</form>");
+    }
+
+    public void printHtmlApartmentEdit(HttpServletResponse response, ApartmentsEntity apartment) throws IOException {
+        println(response,
+                "<form action='./apartments?houseId=" + house.getId() + "' method='POST' accept-charset=\"UTF-8\">",
+                "<tr>",
+                "<td>Измените данные</td>",
+                "<td><input type='number' placeholder='" + apartment.getApartmentNumber() + "' min=1 name='num' " +
+                        "style='width:100%; height:40px; border:0'></td>",
+                "<td><input type='number' step=0.1 placeholder='" + apartment.getSquare() + "' min=1 name='square' " +
+                        "style='width:100%; height:40px; border:0'></td>",
+                "<td><input type='number' placeholder='" + apartment.getFloor() + "' min=1 name='floor' " +
+                        "style='width:100%; height:40px; border:0'></td>",
+                "<input type='hidden' name='view' value='edit'>",
+                "<input type='hidden' name='editId' value='" + apartment.getId() + "'>",
+                "<td><input type='submit' value='Сохранить изменения'></td>",
+                "</tr>",
+                "</form>");
+    }
+
+
+    /**
+     * Инпут для выбора ID дома
+     * @param response
+     * @throws IOException
+     */
+    public void printHtmlPickHouse(HttpServletResponse response) throws IOException {
+        println(response,
+                "<form action='./apartments' method=GET>",
+                "<tr height='40'>",
+                "<td><input type='number' placeholder='Введите сюда ID дома.' min=0" +
+                        " name='houseId' style='width:100%; height:40px; border:0'></td>",
+                "<td><input type='submit' value='Ввести'></td>",
+                "</tr>");
+    }
 }
+
