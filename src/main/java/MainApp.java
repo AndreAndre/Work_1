@@ -36,7 +36,7 @@ public class MainApp {
 
         ApartmentsEntity newApartment = new ApartmentsEntity();
         newApartment.setHouse(house); //id=0
-        newApartment.setHouseId(100);
+        //newApartment.setHouseId(100);
         newApartment.setFloor(8);
         newApartment.setApartmentNumber(1999);
         newApartment.setSquare(55.5);

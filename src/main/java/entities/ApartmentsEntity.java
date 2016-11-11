@@ -16,15 +16,6 @@ public class ApartmentsEntity {
     private Integer id;
     private Integer apartmentNumber;
     private Integer floor;
-
-    public Integer getHouseId() {
-        return houseId;
-    }
-
-    public void setHouseId(Integer houseId) {
-        this.houseId = houseId;
-    }
-
     private Integer houseId;
     private Double square;
     private HousesEntity house;
