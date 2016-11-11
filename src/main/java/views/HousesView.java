@@ -237,8 +237,8 @@ public class HousesView extends HttpServlet {
                 "<td>"+formatForm.format(house.getBuildDate())+"</td>",
 
                 "<td><a href='./apartments?houseId=" + house.getId() + "'><img src='./images/apartments_32.png' title='Список квартир' width='16px'></a>",
-                "<a href='./houses/?view=house'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a>",
-                "<a href='./houses/?view=del&removeId=" + house.getId() + "'><img src='./images/remove_32.png' title='Удалить дом' width='16px'></a></td>",
+                "<a href='./houses?view=house'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a>",
+                "<a href='./houses?view=del&removeId=" + house.getId() + "'><img src='./images/remove_32.png' title='Удалить дом' width='16px'></a></td>",
                 "</tr>");
         }
 
