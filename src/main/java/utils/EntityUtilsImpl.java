@@ -18,16 +18,36 @@ import java.util.List;
 public class EntityUtilsImpl implements EntityUtils {
 
     private void closeSession() {
-        //HibernateSessionFactory.getSessionFactory().openSession().close();
+        HibernateSessionFactory.getSessionFactory().openSession().close();
         //HibernateSessionFactory.shutdown();
     }
 
     public void add(Object entity) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Session session;
+        try {
+            session = HibernateSessionFactory.getSessionFactory().getCurrentSession();
+        } catch (Exception e){
+            session = HibernateSessionFactory.getSessionFactory().openSession();
+        }
         session.beginTransaction();
+        //session.refresh(entity);
         session.save(entity);
         session.getTransaction().commit();
         closeSession();
+    }
+
+    public void update(Object entity) {
+        Session session;
+        try {
+            session = HibernateSessionFactory.getSessionFactory().getCurrentSession();
+        } catch (Exception e){
+            session = HibernateSessionFactory.getSessionFactory().openSession();
+        }
+        session.beginTransaction();
+        session.merge(entity);
+        session.getTransaction().commit();
+        session.flush();
+        session.close();
     }
 
     public Object get(Class objClass, int id) {
@@ -40,9 +60,7 @@ public class EntityUtilsImpl implements EntityUtils {
     public void remove(Class objClass, int id) {
         Session session = HibernateSessionFactory.getSessionFactory().openSession();
         session.beginTransaction();
-
         Object entity = session.load(objClass, id);
-
         //TODO: Добавить нормальную проверку на существованеи объекта. Сейчас, даже если load Не находит по id объект в базе, то почему то house != null
         if (null != entity) {
             try {
@@ -71,17 +89,26 @@ public class EntityUtilsImpl implements EntityUtils {
     //Заглушка
     public List<HousesEntity> listHouse() {
         List<HousesEntity> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from HousesEntity").list();
+        closeSession();
         return entities;
+
     }
 
     /**
      * возвращает лист со всеми квартирами
      */
-    public static List<ApartmentsEntity> listApartments() {
+    public List<ApartmentsEntity> listApartments() {
         List<ApartmentsEntity> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from ApartmentsEntity ").list();
+        closeSession();
         return entities;
     }
-
+/*
+    public void refresh(Object obj) {
+        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        session.refresh(obj);
+        closeSession();
+    }
+*/
 }
 
 

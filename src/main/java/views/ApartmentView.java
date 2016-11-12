@@ -133,7 +133,8 @@ public class ApartmentView extends HttpServlet {
         printHtmlApartmentTableHead(response);
         //создаем коллекцию и вносим в нее ВСЕ квартиры.
         List<ApartmentsEntity> apartments = new ArrayList<ApartmentsEntity>();
-        apartments = EntityUtilsImpl.listApartments();
+        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+        apartments = entityUtils.listApartments();
         //выводим все квартиры в таблицу
         for(ApartmentsEntity apartment : apartments){
             printHtmlApartment(response, apartment);
@@ -158,11 +159,12 @@ public class ApartmentView extends HttpServlet {
      */
     public void editApartment(int editNum, double editSquare, int editFloor, int apartmentId){
         EntityUtilsImpl entityUtils = new EntityUtilsImpl();
-        ApartmentsEntity apartment = (ApartmentsEntity) entityUtils.get(ApartmentsEntity.class, apartmentId);
-
+        List<ApartmentsEntity> apartments = house.getApartmentsEntity();
+        ApartmentsEntity apartment = apartments.get(apartments.indexOf(entityUtils.get(ApartmentsEntity.class, apartmentId)));
         apartment.setApartmentNumber(editNum);
         apartment.setSquare(editSquare);
         apartment.setFloor(editFloor);
+        entityUtils.update(apartment);
     }
 
     /**
@@ -233,11 +235,11 @@ public class ApartmentView extends HttpServlet {
                 "<form action='./apartments?houseId=" + house.getId() + "' method='POST' accept-charset=\"UTF-8\">",
                 "<tr>",
                 "<td>Измените данные</td>",
-                "<td><input type='number' placeholder='" + apartment.getApartmentNumber() + "' min=1 name='num' " +
+                "<td><input type='number' value='" + apartment.getApartmentNumber() + "' min=1 name='num' " +
                         "style='width:100%; height:40px; border:0'></td>",
-                "<td><input type='number' step=0.1 placeholder='" + apartment.getSquare() + "' min=1 name='square' " +
+                "<td><input type='number' step=0.1 value='" + apartment.getSquare() + "' min=1 name='square' " +
                         "style='width:100%; height:40px; border:0'></td>",
-                "<td><input type='number' placeholder='" + apartment.getFloor() + "' min=1 name='floor' " +
+                "<td><input type='number' value='" + apartment.getFloor() + "' min=1 name='floor' " +
                         "style='width:100%; height:40px; border:0'></td>",
                 "<input type='hidden' name='view' value='edit'>",
                 "<input type='hidden' name='editId' value='" + apartment.getId() + "'>",
