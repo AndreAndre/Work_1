@@ -133,4 +133,6 @@ public class ApartmentsEntity {
     public void setPersonalAccountsEntity(List<PersonalAccountsEntity> personalAccountsEntity) {
         this.personalAccountsEntity = personalAccountsEntity;
     }
+
+
 }

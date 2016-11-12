@@ -163,7 +163,36 @@ public class HousesEntity implements Comparable{
      */
     @OneToMany(mappedBy = "house")
     public List<ApartmentsEntity> getApartmentsEntity() {
-        return apartmentsEntity;
+        List<ApartmentsEntity> sortList = new ArrayList<ApartmentsEntity>();
+        List<ApartmentsEntity> resultList = new ArrayList<ApartmentsEntity>();
+
+        for(ApartmentsEntity apartment : apartmentsEntity){
+            sortList.add(apartment);
+        }
+
+        int maxNum = 0;
+        for(ApartmentsEntity apartment : sortList){
+            if(maxNum < apartment.getApartmentNumber()) maxNum = apartment.getApartmentNumber();
+        }
+        int minNum = maxNum;
+
+        for(int i = 0; i < maxNum; i++) {
+            for (ApartmentsEntity apartment : sortList) {
+                if (minNum > apartment.getApartmentNumber()) minNum = apartment.getApartmentNumber();
+            }
+
+
+
+            for(ApartmentsEntity apartment : apartmentsEntity) {
+                if (minNum == apartment.getApartmentNumber()) {
+                    resultList.add(apartment);
+                    sortList.remove(apartment);
+                }
+            }
+            minNum++;
+        }
+
+        return resultList;
     }
 
     public void setApartmentsEntity(List<ApartmentsEntity> apartmentsEntity) {
