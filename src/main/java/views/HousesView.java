@@ -45,8 +45,8 @@ public class HousesView extends HttpServlet {
 
         //Выводим заголовок страницы
         TextUtils.println(response,"<html><head><title>Список домов</title>",
-            "<link rel=\"StyleSheet\" type=\"text/css\" href=\"./css/housesview/style.css\">",
-            "</head><body>");
+                "<link rel=\"StyleSheet\" type=\"text/css\" href=\"./css/housesview/style.css\">",
+                "</head><body>");
 
         //Получаем список параметров и выводим на консоль (отладка)
         Enumeration<String> params =  request.getParameterNames();
@@ -267,14 +267,14 @@ public class HousesView extends HttpServlet {
         //EntityUtilsImpl entityUtils = new EntityUtilsImpl();
         entityUtils.remove(HousesEntity.class,houseId);
     }
+    enum messageStatus {
+        OK,
+        BAD,
+        QUESTION,
+        ATTENTION,
+        INFO,
+        UNKNOWN }
 
 }
 
 //Перечисление для статуса сообщения
-enum messageStatus {
-    OK,
-    BAD,
-    QUESTION,
-    ATTENTION,
-    INFO,
-    UNKNOWN }

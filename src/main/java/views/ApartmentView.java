@@ -66,6 +66,15 @@ public class ApartmentView extends HttpServlet {
                         String contextPathEdit= "./apartments?houseId=" + house.getId();
                         response.sendRedirect(response.encodeRedirectURL(contextPathEdit));
                         break;
+
+                    case "del":
+                        int paramDelete = Integer.parseInt(request.getParameter("removeId"));
+                        int houseId = Integer.parseInt(request.getParameter("houseId"));
+                        removeApartment(paramDelete);
+                        String contextPathDel= "./apartments?houseId=" + houseId;
+                        response.sendRedirect(response.encodeRedirectURL(contextPathDel));
+                        break;
+
                     default:
                         printApartmentTable(request, response);
                         break;
@@ -151,6 +160,11 @@ public class ApartmentView extends HttpServlet {
         entityUtils.add(apartment);
     }
 
+    public void removeApartment(int apartmentId) throws IOException {
+        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+        entityUtils.remove(ApartmentsEntity.class, apartmentId);
+    }
+
     /**
      * Метод редактирует данные о квартире
      * @param editNum
@@ -186,6 +200,20 @@ public class ApartmentView extends HttpServlet {
                 "</tr>");
     }
 
+    public void printHtmlApartmentTableHead(HttpServletResponse response, String message) throws IOException{
+        printStatusMessage(response, message);
+        println(response,
+                "<table cellspacing border cellpadding='2' " +
+                        "align='left' bgcolor='#eeeeee' cols='5' width='960' ",
+                "<tr>",
+                "<th width='350'>Адрес дома</th>",
+                "<th width='50'>Номер квартиры</th>",
+                "<th width='50'>Площадь</th>",
+                "<th width='50'>Этаж</th>",
+                "<th width='50'></th>",
+                "</tr>");
+    }
+
     /**
      * Метод респонсит HTML код, который рисует простую табличную строку с данными о квартире.
      * @param response
@@ -193,6 +221,8 @@ public class ApartmentView extends HttpServlet {
      * @throws IOException
      */
     public void printHtmlApartment(HttpServletResponse response, ApartmentsEntity apartment) throws IOException {
+        HousesEntity house = apartment.getHouse();
+
         println(response,
                 "<tr>",
                 "<td>" + house.getAddress() + "</td>",
@@ -204,7 +234,9 @@ public class ApartmentView extends HttpServlet {
                 "<a href='./residents?apartmentId=" + apartment.getId() +
                         "'><img src='./images/peoples_16.png'></a>",
                 "<a href='?houseId=" + house.getId() + "&editId=" + apartment.getId() +
-                        "'><img src='./images/pencil_16.png'></a></td>",
+                        "'><img src='./images/pencil_16.png'></a>",
+                "<a href='?view=del&houseId=" + house.getId() + "&removeId=" + apartment.getId() +
+                        "'><img src='./images/remove_16.png'></a></td>",
                 "</tr>");
     }
 
@@ -263,6 +295,10 @@ public class ApartmentView extends HttpServlet {
                         " name='houseId' style='width:100%; height:40px; border:0'></td>",
                 "<td><input type='submit' value='Ввести'></td>",
                 "</tr>");
+    }
+
+    public void printStatusMessage(HttpServletResponse response, String message) throws IOException {
+        println(response, "<h2>" + message + "</h2>");
     }
 }
 
