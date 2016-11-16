@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static utils.TextUtils.println;
 
@@ -47,13 +48,11 @@ public class ApartmentView extends HttpServlet {
                         int num = Integer.parseInt(request.getParameter("num"));
                         double square = Double.parseDouble(request.getParameter("square"));
                         int floor = Integer.parseInt(request.getParameter("floor"));
-                        println("перед адд");
+
                         addNewApartment(num, square, floor);
-                        println("после адд");
 
                         String contextPath= "./apartments?houseId=" + house.getId();
                         response.sendRedirect(response.encodeRedirectURL(contextPath));
-                        println("перед брейком");
                         break;
 
                     case "edit":
@@ -73,6 +72,16 @@ public class ApartmentView extends HttpServlet {
                         removeApartment(paramDelete);
                         String contextPathDel= "./apartments?houseId=" + houseId;
                         response.sendRedirect(response.encodeRedirectURL(contextPathDel));
+                        break;
+
+                    case "editAll" :
+                        printApartmentsAllEdit(request, response);
+                        break;
+
+                    case "commitEditAll" :
+                        editApartments(request);
+                        String contextPathCommitEditAll= "./apartments?houseId=" + house.getId();
+                        response.sendRedirect(response.encodeRedirectURL(contextPathCommitEditAll));
                         break;
 
                     default:
@@ -101,9 +110,13 @@ public class ApartmentView extends HttpServlet {
             EntityUtilsImpl entityUtils = new EntityUtilsImpl();
             house = (HousesEntity) entityUtils.get(HousesEntity.class, houseId);
             List<ApartmentsEntity> apartments = house.getApartmentsEntity();
+            Collections.sort(apartments);
             //выводим ввод houseId и квартиры нужного дома
             printHtmlPickHouse(response);
             println(response, "<h1>Квариры дома '" + house.getAddress() + "'</h1>");
+
+            println(response, "<a href='./apartments?view=editAll&houseId=" + house.getId() + "'>" +
+                    "Перейти в режим редактирования</a></br>");
             printHtmlApartmentTableHead(response);  //шапка таблицы
 
             for (ApartmentsEntity apartment : apartments) {
@@ -145,10 +158,52 @@ public class ApartmentView extends HttpServlet {
         List<ApartmentsEntity> apartments = new ArrayList<ApartmentsEntity>();
         EntityUtilsImpl entityUtils = new EntityUtilsImpl();
         apartments = entityUtils.listApartments();
+        Collections.sort(apartments);
         //выводим все квартиры в таблицу
         for(ApartmentsEntity apartment : apartments){
             printHtmlApartment(response, apartment);
         }
+    }
+
+    /**
+     * рисует таблицу где все строки редактируются
+     * @param request
+     * @param response
+     * @throws IOException
+     */
+    public void printApartmentsAllEdit(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int houseId = Integer.parseInt(request.getParameter("houseId")); //получаем ID дома
+        //берем из базы указанный дом и все его квартиры помещаем в лист apartments.
+        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+        house = (HousesEntity) entityUtils.get(HousesEntity.class, houseId);
+        List<ApartmentsEntity> apartments = house.getApartmentsEntity();
+        Collections.sort(apartments);
+        //выводим ввод houseId и квартиры нужного дома
+        printHtmlPickHouse(response);
+        println(response, "<h1>Режим редактирования! Квариры дома '" + house.getAddress() + "'</h1>");
+
+        printHtmlApartmentTableHead(response);
+        println(response, "<form action='./apartments' method='POST' accept-charset=\"UTF-8\">");
+        for(ApartmentsEntity apartment : apartments){
+            println(response,
+                    "<tr>",
+                    "<td>" + house.getAddress() + "</td>",
+                    "<input type='hidden' name='apartmentId' value='" + apartment.getId() + "'>",
+                    "<td><input type='number' value='" + apartment.getApartmentNumber() + "' min=1 name='num' " +
+                            "style='width:100%; height:40px; border:0'></td>",
+                    "<td><input type='number' step=0.1 value='" + apartment.getSquare() + "' min=1 name='square' " +
+                            "style='width:100%; height:40px; border:0'></td>",
+                    "<td><input type='number' value='" + apartment.getFloor() + "' min=1 name='floor' " +
+                            "style='width:100%; height:40px; border:0'></td>",
+                    "</tr>");
+        }
+        println(response,
+                "<tr>",
+                "<input type='hidden' name='view' value='commitEditAll'>",
+                "<td><input type='submit' value='Сохранить все изменения'></td>",
+                "</tr>");
+        println(response, "</form>");
+
     }
 
 
@@ -181,6 +236,29 @@ public class ApartmentView extends HttpServlet {
         apartment.setFloor(editFloor);
         entityUtils.update(apartment);
     }
+
+    public void editApartments(HttpServletRequest request){
+        Map<String,String[]> editApartments = request.getParameterMap();
+        String[] id = editApartments.get("apartmentId");
+        String[] num = editApartments.get("num");
+        String[] square = editApartments.get("square");
+        String[] floor = editApartments.get("floor");
+        EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+
+        for(int i = 0; i < num.length; i++){
+            ApartmentsEntity apartment = (ApartmentsEntity) entityUtils.get(ApartmentsEntity.class, Integer.parseInt(id[i]));
+            if(apartment != null) {
+                int numEdit = Integer.parseInt(num[i]);
+                Double squareEdit = Double.parseDouble(square[i]);
+                int floorEdit = Integer.parseInt(floor[i]);
+                int idEdit = Integer.parseInt(id[i]);
+
+                editApartment(numEdit, squareEdit, floorEdit, idEdit);
+            }
+        }
+
+    }
+
 
     /**
      * Заголовок таблицы
@@ -263,6 +341,7 @@ public class ApartmentView extends HttpServlet {
                 "</form>");
     }
 
+
     public void printHtmlApartmentEdit(HttpServletResponse response, ApartmentsEntity apartment) throws IOException {
         println(response,
                 "<form action='./apartments?houseId=" + house.getId() + "' method='POST' accept-charset=\"UTF-8\">",
@@ -289,7 +368,7 @@ public class ApartmentView extends HttpServlet {
      */
     public void printHtmlPickHouse(HttpServletResponse response) throws IOException {
         println(response,
-                "<form action='./apartments' method=GET>",
+                "<form action='./apartments' method=POST>",
                 "<tr height='40'>",
                 "<td><input type='number' placeholder='Введите сюда ID дома.' min=0" +
                         " name='houseId' style='width:100%; height:40px; border:0'></td>",
@@ -300,5 +379,7 @@ public class ApartmentView extends HttpServlet {
     public void printStatusMessage(HttpServletResponse response, String message) throws IOException {
         println(response, "<h2>" + message + "</h2>");
     }
+
+
 }
 
