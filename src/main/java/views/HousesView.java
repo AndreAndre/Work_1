@@ -1,7 +1,9 @@
 package views;
 
+import com.mchange.v2.collection.MapEntry;
 import entities.HousesEntity;
 import utils.EntityUtilsImpl;
+import utils.EntityUtilsImpl2;
 import utils.TextUtils;
 
 import javax.servlet.ServletException;
@@ -14,9 +16,7 @@ import java.net.URLEncoder;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 //TODO: HTML тупо в лоб - не очень хорошо. Нужно подумать, как лучше генерировать страницы
 //TODO: комментарии и документация к методам.
 //TODO: подтверждение удаления дома
@@ -28,7 +28,7 @@ import java.util.List;
 public class HousesView extends HttpServlet {
 
     //Объявляем объект класса с утилитами для работы с Entity
-    EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+    EntityUtilsImpl2 entityUtils = new EntityUtilsImpl2();
     /*
     public HousesView() {
         super();
@@ -38,6 +38,7 @@ public class HousesView extends HttpServlet {
     //Делаем при работе с GET-запросами
     //Основной метод
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        entityUtils.openSession();
 
         //Устанавливаем кодировку на запрос/ответ
         response.setContentType("text/html; charset=utf-8");
@@ -47,12 +48,8 @@ public class HousesView extends HttpServlet {
         TextUtils.println(response,"<html><head><title>Список домов</title>",
             "<link rel=\"StyleSheet\" type=\"text/css\" href=\"./css/housesview/style.css\">",
             "</head><body>");
-
-        //Получаем список параметров и выводим на консоль (отладка)
-        Enumeration<String> params =  request.getParameterNames();
-        while (params.hasMoreElements()) {
-            System.out.println("Параметр " + params.nextElement());
-        }
+        //PrintWriter htmlPage = response.getWriter();
+        TextUtils.println(response,"<h1>Дома</h1>");
 
         //Параметр view передаваемый в request - отвечает за функции страницы
         String paramView = request.getParameter("view");
@@ -125,6 +122,35 @@ public class HousesView extends HttpServlet {
                 case "house":
                     printHouseInfo(request, response);
                     break;
+                case "table_edit":
+                    printEditableHousesTable(request, response);
+                    break;
+                case "edit":
+                    //Получаем список параметров и выводим на консоль (отладка)
+                    //Enumeration<String> params =  request.getParameterNames();
+                    Map<String,String[]> params = request.getParameterMap();
+                    String[] houseIDs = params.get("houseID");
+                    String[] address = params.get("address");
+                    String[] floors = params.get("floors");
+                    String[] builDates = params.get("buildDate");
+                    List<Object> editableHouses = new ArrayList<Object>();
+                    System.out.println("houseIDs cnt: " + houseIDs.length);
+                    for (int i = 0; i < houseIDs.length; i++) {
+                        HousesEntity house = (HousesEntity) entityUtils.get(HousesEntity.class, Integer.parseInt(houseIDs[i]));
+                        if (house != null) {
+                            house.setAddress(address[i]);
+                            house.setFloors(Integer.parseInt(floors[i]));
+                            house.setBuildDate(Date.valueOf(builDates[i]));
+                            entityUtils.update(house);
+                            //editableHouses.add(house);
+                        }
+                    }
+
+                    //entityUtils.updateList(editableHouses);
+                    printHousesTable(request, response);
+
+
+                    break;
                 default:
                     printHousesTable(request, response);
                     break;
@@ -133,6 +159,7 @@ public class HousesView extends HttpServlet {
 
         TextUtils.println(response,
                 "</bode></html>");
+        entityUtils.closeSession();
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -209,22 +236,19 @@ public class HousesView extends HttpServlet {
      * @throws IOException
      */
     private void printHousesTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        //PrintWriter htmlPage = response.getWriter();
-        TextUtils.println(response,"<h1>Дома</h1>");
-
         //Получим и выведем табличку с домами
         //EntityUtilsImpl entityUtils = new EntityUtilsImpl();
         List<HousesEntity> houses = entityUtils.listHouse();
         Collections.sort(houses);
         TextUtils.println(response,
-            "<table cellspacing=\"2\" border=\"1\" cellpadding=\"2\" width=\"960\">",
-            "<tr>",
-            "<th>Адрес дома</th>",
-            "<th>Количество этажей</th>",
-            "<th>Дата постройки</th>",
-            "<th width=\"120\">Операции</th>",
-           "</tr>");
+                "<a href='./houses?view=table_edit'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a>",
+                "<table cellspacing=\"2\" border=\"1\" cellpadding=\"2\" width=\"960\">",
+                "<tr>",
+                "<th>Адрес дома</th>",
+                "<th>Количество этажей</th>",
+                "<th>Дата постройки</th>",
+                "<th width=\"120\">Операции</th>",
+                 "</tr>");
 
         for (HousesEntity house :
                 houses) {
@@ -232,9 +256,9 @@ public class HousesView extends HttpServlet {
             DateFormat formatForm = new SimpleDateFormat("dd.MM.yyyy");//dd.MM.yyyy
 
             TextUtils.println(response,"<tr>",
-                "<td>"+house.getAddress()+"</td>",
-                "<td>"+house.getFloors()+"</td>",
-                "<td>"+formatForm.format(house.getBuildDate())+"</td>",
+                "<td contenteditable='true'>"+house.getAddress()+"</td>",
+                "<td contenteditable='true'>"+house.getFloors()+"</td>",
+                "<td contenteditable='true'>"+formatForm.format(house.getBuildDate())+"</td>",
 
                 "<td><a href='./apartments?houseId=" + house.getId() + "'><img src='./images/apartments_32.png' title='Список квартир' width='16px'></a>",
                 "<a href='./houses?view=house'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a>",
@@ -248,8 +272,51 @@ public class HousesView extends HttpServlet {
                 "<td><input type='text' placeholder='Адрес нового дома' name='address' style='width:100%; height:40px; border:0'></td>",
                 "<td><input type='number' placeholder='Этажей' min=1 name='floors' style='width:100%; height:40px; border:0'></td>",
                 "<td><input type='date' placeholder='Дата постройки' name='buildDate' style='width:100%; height:40px; border:0'></td>",
-                "<input type='hidden' name='view' value='add'>",
+                "<input type='hidden' name='view' value='edit'>",
                 "<td><input type='submit' value='Добавить дом'></td>",
+                "</tr>",
+                "</form>"
+        );
+
+        TextUtils.println(response,"</table>");
+    }
+
+    private void printEditableHousesTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //Получим и выведем табличку с домами
+        //EntityUtilsImpl entityUtils = new EntityUtilsImpl();
+        List<HousesEntity> houses = entityUtils.listHouse();
+        Collections.sort(houses);
+        TextUtils.println(response,
+                "<table cellspacing=\"2\" border=\"1\" cellpadding=\"2\" width=\"960\">",
+                "<form action='./houses' method='POST' accept-charset=\"UTF-8\">",
+                "<tr>",
+                "<th>Адрес дома</th>",
+                "<th>Количество этажей</th>",
+                "<th>Дата постройки</th>",
+                "<th width=\"120\">Операции</th>",
+                "</tr>");
+
+        for (HousesEntity house :
+                houses) {
+            //Формат даты
+            DateFormat formatForm = new SimpleDateFormat("dd.MM.yyyy");//dd.MM.yyyy
+
+            TextUtils.println(response,"<tr>",
+                    "<input type='hidden' name='houseID' value='"+house.getId()+"'>",
+                    "<td><input type='text' placeholder='Адрес нового дома' value='"+house.getAddress()+"' name='address' style='width:100%; height:40px; border:0'></td>",
+                    "<td><input type='number' placeholder='Этажей' value='"+house.getFloors()+"' min=1 name='floors' style='width:100%; height:40px; border:0'></td>",
+                    "<td><input type='date' placeholder='Дата постройки'value='"+house.getBuildDate()+"' name='buildDate' style='width:100%; height:40px; border:0'></td>",
+                    "<td></td>",
+                    "</tr>");
+        }
+
+        TextUtils.println(response,
+                "<tr>",
+                "<td></td>",
+                "<td></td>",
+                "<td></td>",
+                "<input type='hidden' name='view' value='edit'>",
+                "<td><input type='submit' value='Сохранить изменения'></td>",
                 "</tr>",
                 "</form>"
         );

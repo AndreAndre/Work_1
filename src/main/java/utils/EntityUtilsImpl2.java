@@ -15,68 +15,53 @@ import java.util.List;
  * Created by fedyu on 04.11.2016.
  * Класс для служебных методов по работе с домами (добавить, удалить, обновить, считать и т.д)
  */
-public class EntityUtilsImpl implements EntityUtils {
+public class EntityUtilsImpl2 implements EntityUtils {
+    Session session;
 
-    private void closeSession() {
-        HibernateSessionFactory.getSessionFactory().openSession().close();
-        //HibernateSessionFactory.shutdown();
+    public void openSession() {
+        session = HibernateSessionFactory.getSessionFactory().openSession();
+    }
+
+    public void closeSession() {
+        session.close();
     }
 
     public void add(Object entity) {
-        Session session;
-        try {
-            session = HibernateSessionFactory.getSessionFactory().getCurrentSession();
-        } catch (Exception e){
-            session = HibernateSessionFactory.getSessionFactory().openSession();
-        }
         session.beginTransaction();
         //session.refresh(entity);
         session.save(entity);
         session.getTransaction().commit();
-        closeSession();
+        session.flush();
     }
 
     public void update(Object entity) {
-        Session session;
-        try {
-            session = HibernateSessionFactory.getSessionFactory().getCurrentSession();
-        } catch (Exception e){
-            session = HibernateSessionFactory.getSessionFactory().openSession();
-        }
         session.beginTransaction();
-        session.merge(entity);
+        session.saveOrUpdate(entity);
         session.getTransaction().commit();
         session.flush();
-        session.close();
     }
 
     public void updateList(List<Object> entitys) {
-        Session session;
-        try {
-            session = HibernateSessionFactory.getSessionFactory().getCurrentSession();
-        } catch (Exception e){
-            session = HibernateSessionFactory.getSessionFactory().openSession();
-        }
         session.beginTransaction();
         for (Object entity :
                 entitys) {
-            session.merge(entity);
+            session.saveOrUpdate(entity);
         }
-
         session.getTransaction().commit();
         session.flush();
-        session.close();
     }
 
     public Object get(Class objClass, int id) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
+        Object entity = session.get(objClass, id);
+        return entity;
+    }
+
+    public Object load(Class objClass, int id) {
         Object entity = session.load(objClass, id);
-        closeSession();
         return entity;
     }
 
     public void remove(Class objClass, int id) {
-        Session session = HibernateSessionFactory.getSessionFactory().openSession();
         session.beginTransaction();
         Object entity = session.load(objClass, id);
         //TODO: Добавить нормальную проверку на существованеи объекта. Сейчас, даже если load Не находит по id объект в базе, то почему то house != null
@@ -90,7 +75,6 @@ public class EntityUtilsImpl implements EntityUtils {
                 System.out.println("Объекта, который вы пытаетесь удалить - не существует.");
             }
         }
-        closeSession();
     }
 
     //TODO: Не работает. Починить
@@ -98,7 +82,6 @@ public class EntityUtilsImpl implements EntityUtils {
         String entityName = objClass.toString();
         System.out.println("entityName " + entityName);
         List<HousesEntity> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from HousesEntity").list();
-        closeSession();
         List<Object> obj = new ArrayList<Object>();
         obj.add(entities);
         return obj;
@@ -107,7 +90,6 @@ public class EntityUtilsImpl implements EntityUtils {
     //Заглушка
     public List<HousesEntity> listHouse() {
         List<HousesEntity> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from HousesEntity").list();
-        closeSession();
         return entities;
 
     }
@@ -117,7 +99,6 @@ public class EntityUtilsImpl implements EntityUtils {
      */
     public List<ApartmentsEntity> listApartments() {
         List<ApartmentsEntity> entities = HibernateSessionFactory.getSessionFactory().openSession().createQuery("from ApartmentsEntity ").list();
-        closeSession();
         return entities;
     }
 /*

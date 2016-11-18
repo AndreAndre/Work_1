@@ -163,6 +163,7 @@ public class HousesEntity implements Comparable{
      */
     @OneToMany(mappedBy = "house")
     public List<ApartmentsEntity> getApartmentsEntity() {
+/*
         List<ApartmentsEntity> sortList = new ArrayList<ApartmentsEntity>();
         List<ApartmentsEntity> resultList = new ArrayList<ApartmentsEntity>();
 
@@ -192,7 +193,9 @@ public class HousesEntity implements Comparable{
             minNum++;
         }
 
-        return resultList;
+        return resultList;*/
+    return this.apartmentsEntity;
+
     }
 
     public void setApartmentsEntity(List<ApartmentsEntity> apartmentsEntity) {
