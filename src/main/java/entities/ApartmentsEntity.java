@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "apartments", schema = "public", catalog = "work_v1")
-public class ApartmentsEntity {
+public class ApartmentsEntity implements Comparable{
     private Integer id;
     private Integer apartmentNumber;
     private Integer floor;
@@ -135,4 +135,10 @@ public class ApartmentsEntity {
     }
 
 
+    @Override
+    public int compareTo(Object o) {
+        ApartmentsEntity aprt = (ApartmentsEntity) o;
+        if(this.getHouse().compareTo(aprt.getHouse()) != 0 ) return this.getHouse().compareTo(aprt.getHouse());
+        return this.getApartmentNumber().compareTo(aprt.getApartmentNumber());
+    }
 }
