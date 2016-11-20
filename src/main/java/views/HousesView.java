@@ -159,7 +159,7 @@ public class HousesView extends HttpServlet {
 
         TextUtils.println(response,
                 "</bode></html>");
-        entityUtils.closeSession();
+        //entityUtils.closeSession();
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -252,18 +252,7 @@ public class HousesView extends HttpServlet {
 
         for (HousesEntity house :
                 houses) {
-            //Формат даты
-            DateFormat formatForm = new SimpleDateFormat("dd.MM.yyyy");//dd.MM.yyyy
-
-            TextUtils.println(response,"<tr>",
-                "<td contenteditable='true'>"+house.getAddress()+"</td>",
-                "<td contenteditable='true'>"+house.getFloors()+"</td>",
-                "<td contenteditable='true'>"+formatForm.format(house.getBuildDate())+"</td>",
-
-                "<td><a href='./apartments?houseId=" + house.getId() + "'><img src='./images/apartments_32.png' title='Список квартир' width='16px'></a>",
-                "<a href='./houses?view=house'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a>",
-                "<a href='./houses?view=del&removeId=" + house.getId() + "'><img src='./images/remove_32.png' title='Удалить дом' width='16px'></a></td>",
-                "</tr>");
+            TextUtils.println(response,printTableRow(house));
         }
 
         TextUtils.println(response,
@@ -281,6 +270,12 @@ public class HousesView extends HttpServlet {
         TextUtils.println(response,"</table>");
     }
 
+    /**
+     * Отображает таблицу с домами, доступную для редактирования
+     * @param request
+     * @param response
+     * @throws IOException
+     */
     private void printEditableHousesTable(HttpServletRequest request, HttpServletResponse response) throws IOException {
         //Получим и выведем табличку с домами
         //EntityUtilsImpl entityUtils = new EntityUtilsImpl();
@@ -296,18 +291,8 @@ public class HousesView extends HttpServlet {
                 "<th width=\"120\">Операции</th>",
                 "</tr>");
 
-        for (HousesEntity house :
-                houses) {
-            //Формат даты
-            DateFormat formatForm = new SimpleDateFormat("dd.MM.yyyy");//dd.MM.yyyy
-
-            TextUtils.println(response,"<tr>",
-                    "<input type='hidden' name='houseID' value='"+house.getId()+"'>",
-                    "<td><input type='text' placeholder='Адрес нового дома' value='"+house.getAddress()+"' name='address' style='width:100%; height:40px; border:0'></td>",
-                    "<td><input type='number' placeholder='Этажей' value='"+house.getFloors()+"' min=1 name='floors' style='width:100%; height:40px; border:0'></td>",
-                    "<td><input type='date' placeholder='Дата постройки'value='"+house.getBuildDate()+"' name='buildDate' style='width:100%; height:40px; border:0'></td>",
-                    "<td></td>",
-                    "</tr>");
+        for (HousesEntity house : houses) {
+            TextUtils.println(response,printEditableTableRow(house));
         }
 
         TextUtils.println(response,
@@ -322,6 +307,35 @@ public class HousesView extends HttpServlet {
         );
 
         TextUtils.println(response,"</table>");
+    }
+
+    private String printTableRow(HousesEntity house) {
+        //Формат даты
+        DateFormat formatForm = new SimpleDateFormat("dd.MM.yyyy");//dd.MM.yyyy
+        String row =
+        "<tr>"+
+        "<td>"+house.getAddress()+"</td>"+
+        "<td>"+house.getFloors()+"</td>"+
+        "<td>"+formatForm.format(house.getBuildDate())+"</td>"+
+        "<td><a href='./apartments?houseId=" + house.getId() + "'><img src='./images/apartments_32.png' title='Список квартир' width='16px'></a>"+
+        "<a href='./houses?view=house'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a>"+
+        "<a href='./houses?view=del&removeId=" + house.getId() + "'><img src='./images/remove_32.png' title='Удалить дом' width='16px'></a></td>"+
+         "</tr>";
+        return row;
+    }
+
+    private String printEditableTableRow(HousesEntity house) {
+        //Формат даты
+        DateFormat formatForm = new SimpleDateFormat("dd.MM.yyyy");//dd.MM.yyyy
+        String row =
+            "<tr>"+
+            "<input type='hidden' name='houseID' value='"+house.getId()+"'>"+
+            "<td><input type='text' placeholder='Адрес нового дома' value='"+house.getAddress()+"' name='address' style='width:100%; height:40px; border:0'></td>"+
+            "<td><input type='number' placeholder='Этажей' value='"+house.getFloors()+"' min=1 name='floors' style='width:100%; height:40px; border:0'></td>"+
+            "<td><input type='date' placeholder='Дата постройки'value='"+house.getBuildDate()+"' name='buildDate' style='width:100%; height:40px; border:0'></td>"+
+            "<td></td>"+
+            "</tr>";
+        return row;
     }
 
     /**
