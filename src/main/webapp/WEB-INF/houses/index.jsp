@@ -76,7 +76,7 @@
         </form>
     </c:when>
     <c:otherwise>
-        Не выбрано ни одно условие (1).
+        Не выбрано ни одно условие.
     </c:otherwise>
 </c:choose>
     <form action='./houseAddNew' method='POST' accept-charset=\"UTF-8\">
