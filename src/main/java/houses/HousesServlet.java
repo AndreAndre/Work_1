@@ -18,55 +18,64 @@ import java.util.Map;
 /**
  * Created by fedyu on 20.11.2016.
  */
-@WebServlet(name = "HousesServlet", urlPatterns = "/houseList")
+@WebServlet(name = "HousesServlet", urlPatterns = {"/houseList", "/editableHouseList", "/houseRemove", "/houseEdit", "/houseSaveOrUpdate", "/houseAddNew"})
 public class HousesServlet extends HttpServlet {
     EntityUtilsImpl2 entityUtils = new EntityUtilsImpl2();
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doPost(request, response);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         entityUtils.openSession();
 
         //Устанавливаем кодировку на запрос/ответ
         response.setContentType("text/html; charset=utf-8");
         request.setCharacterEncoding("UTF-8");
 
-        //Параметр view передаваемый в request - отвечает за функции страницы
-        String pOperation = request.getParameter("op");
-        //Если параметров нет, или равен "view"  - отображаем по умолчанию таблицу домов
-        if (pOperation == null || pOperation.isEmpty() || pOperation == "view")
+        //Определяем действия
+        if (request.getServletPath().equals("/houseList")) {
             rHousesTable(request, response);
-            //Иначе проверяем значение параметра и делаем что-нибудь соответственно
-        else {
-            switch (pOperation) {
-                //Удаление записи
-                case "deleteRow":
-                    rDeleteRow(request, response);
-                    break;
-                //Редактирование строки
-                case "editableRow":
-                    rEditableRow(request, response);
-                    break;
-                //Редактирование таблицы
-                case "editableTable":
-                    rEditableTable(request, response);
-                    break;
-                //Приход команды на изменение данных
-                case "saveOrUpdate":
-                    rSaveOrUpdate(request, response);
-                    break;
-                default:
-                    rHousesTable(request, response);
-            }
+        } else if (request.getServletPath().equals("/houseRemove")) {
+            System.out.println("Получили запрос на удаление");
+            rHouseRemove(request, response);
+        } else if (request.getServletPath().equals("/houseEdit")) {
+            System.out.println("Получили запрос на редактирование");
+            rHouseEditRow(request, response);
+        } else if (request.getServletPath().equals("/editableHouseList")) {
+            System.out.println("Открыть таблицу на редактирование");
+            rHousesEditableTable(request, response);
+        } else if (request.getServletPath().equals("/houseSaveOrUpdate")) {
+            System.out.println("Приняли запрос на изменение данных");
+            rHouseSaveOrUpdate(request, response);
+        } else if (request.getServletPath().equals("/houseAddNew")) {
+            System.out.println("Добавляем новую строку");
+            rHouseAddNew(request, response);
         }
 
-
-        entityUtils.closeSession();
+        //entityUtils.closeSession();
     }
 
-    private void rSaveOrUpdate(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void rHouseEditRow(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute("op", "editableRow");
+        request.setAttribute("id", request.getParameter("id"));
+        request.setAttribute("houses", entityUtils.listHouse());
+        request.setAttribute("text_h1","Список домов на редактирование.");
+        request.getRequestDispatcher("WEB-INF/houses/index.jsp").forward(request,response);
+    }
+
+    private void rHouseAddNew(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //Получаем параметры из запроса
+        String paramAddress = request.getParameter("address");
+        int paramFloors =  Integer.parseInt(request.getParameter("floors"));
+        Date paramBuildDate = Date.valueOf(request.getParameter("buildDate"));
+        //Вызываем метод добавления новой записи в БД
+        HousesEntity newHouse = new HousesEntity(paramAddress, paramFloors, paramBuildDate);
+        entityUtils.add(newHouse);
+        response.sendRedirect(response.encodeRedirectURL("/houseList"));
+    }
+
+    private void rHouseSaveOrUpdate(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Map<String,String[]> params = request.getParameterMap();
         String[] houseIDs = params.get("houseID");
         String[] address = params.get("address");
@@ -84,39 +93,27 @@ public class HousesServlet extends HttpServlet {
                 //editableHouses.add(house);
             }
         }
-        rHousesTable(request, response);//Перенаправдяем на отрисовку
+        response.sendRedirect(response.encodeRedirectURL("/houseList"));
     }
 
-    private void rEditableTable(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("op","editableTable");
-        request.setAttribute("houses", entityUtils.listHouse());
-        request.setAttribute("text_h1","Редактирование таблицы: ");
-        request.getRequestDispatcher("WEB-INF/houses/index.jsp").forward(request,response);
-    }
-
-    private void rEditableRow(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("op","editableRow");
-        request.setAttribute("id",request.getParameter("id"));
-        request.setAttribute("houses", entityUtils.listHouse());
-        request.setAttribute("text_h1","Редактирование записи: ");
-        request.getRequestDispatcher("WEB-INF/houses/index.jsp").forward(request,response);
-    }
-
-    private void rDeleteRow(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void rHouseRemove(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
-        System.out.println("Delete id = " + id);
+        System.out.println("paramDelete = " + id);
         entityUtils.remove(HousesEntity.class,id);
-        rHousesTable(request, response);//Перенаправдяем на отрисовку
+        response.sendRedirect(response.encodeRedirectURL("/houseList"));
     }
 
     private void rHousesTable(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Enumeration<String> params =  request.getParameterNames();
-        while (params.hasMoreElements()) {
-            request.removeAttribute(params.nextElement());
-        }
         request.setAttribute("op", "view");
         request.setAttribute("houses", entityUtils.listHouse());
         request.setAttribute("text_h1","Список домов на просмотр.");
+        request.getRequestDispatcher("WEB-INF/houses/index.jsp").forward(request,response);
+    }
+
+    private void rHousesEditableTable(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute("op", "editableTable");
+        request.setAttribute("houses", entityUtils.listHouse());
+        request.setAttribute("text_h1","Список домов на редактирование.");
         request.getRequestDispatcher("WEB-INF/houses/index.jsp").forward(request,response);
     }
 }
