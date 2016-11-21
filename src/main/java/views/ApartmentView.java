@@ -244,7 +244,7 @@ public class ApartmentView extends HttpServlet {
         String[] square = editApartments.get("square");
         String[] floor = editApartments.get("floor");
         EntityUtilsImpl entityUtils = new EntityUtilsImpl();
-
+        List<Object> apartments = new ArrayList<Object>();
         for(int i = 0; i < num.length; i++){
             ApartmentsEntity apartment = (ApartmentsEntity) entityUtils.get(ApartmentsEntity.class, Integer.parseInt(id[i]));
             if(apartment != null) {
@@ -253,9 +253,16 @@ public class ApartmentView extends HttpServlet {
                 int floorEdit = Integer.parseInt(floor[i]);
                 int idEdit = Integer.parseInt(id[i]);
 
-                editApartment(numEdit, squareEdit, floorEdit, idEdit);
+                apartment.setApartmentNumber(numEdit);
+                apartment.setSquare(squareEdit);
+                apartment.setFloor(floorEdit);
+
+                apartments.add(apartment);
+                //editApartment(numEdit, squareEdit, floorEdit, idEdit);
             }
         }
+        entityUtils.updateList(apartments);
+
 
     }
 
