@@ -8,9 +8,13 @@
     <link rel="StyleSheet" type="text/css" href="./css/housesview/style.css">
 </head>
 <body>
+
+<%-- Включаем в документ шапку из отдельного файла --%>
+<jsp:include page="../template/header.jsp" flush="false"/>
+
 <h1>${text_h1}</h1>
 
-<a href='./editableHouseList'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a></br>
+<a href='/house/editable'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a></br>
 <table  cellspacing="2" border="1" cellpadding="2" width="960">
     <tr>
         <th>Адрес</th>
@@ -31,15 +35,15 @@
                 <td>${house.buildDate}</td>
                 <td>
                     <a href='./apartments?houseId=${house.id}'><img src='./images/apartments_32.png' title='Список квартир' width='16px'></a>
-                    <a href='./houseEdit?id=${house.id}'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a>
-                    <a href='./houseRemove?id=${house.id}'><img src='./images/remove_32.png' title='Удалить дом' width='16px'></a>
+                    <a href='/house/editRow?id=${house.id}'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a>
+                    <a href='/house/remove?id=${house.id}'><img src='./images/remove_32.png' title='Удалить дом' width='16px'></a>
                 </td>
             </tr>
         </c:forEach>
     </c:when>
     <%-- Выводим таблицу для редактирования --%>
     <c:when test="${op == 'editableTable'}">
-        <form action='./houseSaveOrUpdate' method='POST' accept-charset="UTF-8">
+        <form action='/house/update' method='POST' accept-charset="UTF-8">
             <c:forEach items="${houses}" var="house">
                 <tr>
                     <input type='hidden' name='houseID' value='${house.id}'>
@@ -55,7 +59,7 @@
     </c:when>
     <%-- Выводим одну запись для редактирования --%>
     <c:when test="${op == 'editableRow'}">
-        <form action='./houseSaveOrUpdate' method='POST' accept-charset="UTF-8">
+        <form action='/house/update' method='POST' accept-charset="UTF-8">
             <c:forEach items="${houses}" var="house">
                 <tr>
                     <c:if test="${id == house.id}">
@@ -79,7 +83,7 @@
         Не выбрано ни одно условие.
     </c:otherwise>
 </c:choose>
-    <form action='./houseAddNew' method='POST' accept-charset=\"UTF-8\">
+    <form action='/house/add' method='POST' accept-charset=\"UTF-8\">
     <tr>
         <td><input type='text' placeholder='Адрес нового дома' name='address' style='width:100%; height:40px; border:0'></td>
         <td><input type='number' placeholder='Этажей' min=1 name='floors' style='width:100%; height:40px; border:0'></td>
@@ -90,5 +94,8 @@
     </form>
 
 </table>
+
+<%-- Включаем в документ футер из отдельного файла --%>
+<jsp:include page="../template/footer.jsp" flush="false"/>
 </body>
 </html>

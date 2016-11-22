@@ -1,3 +1,4 @@
+//TODO: нормальную работу с ссылками вида /house/list
 package houses.servlets;
 
 import entities.HousesEntity;
@@ -18,7 +19,7 @@ import java.util.Map;
 /**
  * Created by fedyu on 20.11.2016.
  */
-@WebServlet(name = "HouseList", urlPatterns = {"/houseList", "/editableHouseList", "/houseEdit"})
+@WebServlet(name = "HouseList", urlPatterns = {"/houseList", "/house/list", "/house/editable", "/house/editRow"})
 public class HouseList extends HttpServlet {
     EntityUtilsImpl2 entityUtils = new EntityUtilsImpl2();
 
@@ -34,12 +35,12 @@ public class HouseList extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         //Определяем действия
-        if (request.getServletPath().equals("/houseList")) {
+        if (request.getServletPath().equals("/house/list") || request.getServletPath().equals("/houseList")) {
             rHousesTable(request, response);
-        } else if (request.getServletPath().equals("/houseEdit")) {
+        } else if (request.getServletPath().equals("/house/editRow")) {
             System.out.println("Получили запрос на редактирование");
             rHouseEditRow(request, response);
-        } else if (request.getServletPath().equals("/editableHouseList")) {
+        } else if (request.getServletPath().equals("/house/editable")) {
             System.out.println("Открыть таблицу на редактирование");
             rHousesEditableTable(request, response);
         }
@@ -51,7 +52,7 @@ public class HouseList extends HttpServlet {
         request.setAttribute("id", request.getParameter("id"));
         request.setAttribute("houses", entityUtils.listHouse());
         request.setAttribute("text_h1","Список домов на редактирование.");
-        request.getRequestDispatcher("WEB-INF/houses/index.jsp").forward(request,response);
+        request.getRequestDispatcher("./WEB-INF/houses/index.jsp").forward(request,response);
     }
 
 

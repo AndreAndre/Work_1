@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * Created by fedyu on 21.11.2016.
  */
-@WebServlet(name = "HouseRemove", urlPatterns = {"/houseRemove"})
+@WebServlet(name = "HouseRemove", urlPatterns = {"/houseRemove", "/house/remove"})
 public class HouseRemove extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //Устанавливаем кодировку на запрос/ответ

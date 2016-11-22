@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Created by fedyu on 21.11.2016.
  */
-@WebServlet(name = "HouseAddNew", urlPatterns = {"/houseAddNew"})
+@WebServlet(name = "HouseAddNew", urlPatterns = {"/houseAddNew", "/house/add"})
 public class HouseAddNew extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //Устанавливаем кодировку на запрос/ответ
