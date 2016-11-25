@@ -16,7 +16,7 @@
 
 <h1>${text_h1}</h1>
 
-<a  href='http://localhost:8008/house/editable'><img title='Редактировать дом' src='<c:url value="/images/edit_32.png"/>'  width='16px'></a></br>
+<a  href='/house/editable'><img title='Редактировать дом' src='<c:url value="/images/edit_32.png"/>'  width='16px'></a></br>
 <table  cellspacing="2" border="1" cellpadding="2" width="960">
     <tr>
         <th>Адрес</th>
