@@ -43,7 +43,7 @@ public class HouseSaveOrUpdate extends HttpServlet {
                 //editableHouses.add(house);
             }
         }
-        response.sendRedirect(response.encodeRedirectURL("/houseList"));
+        response.sendRedirect(response.encodeRedirectURL("/house/list"));
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

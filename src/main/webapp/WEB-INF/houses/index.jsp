@@ -5,16 +5,18 @@
 <html>
 <head>
     <title>Список домов</title>
-    <link rel="StyleSheet" type="text/css" href="./css/housesview/style.css">
-</head>
-<body>
-
+    <%--<link rel="StyleSheet" type="text/css" href="./css/housesview/style.css">--%>
+    <%-- <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/styles.css"> --%>
+    <link rel="stylesheet" type="text/css" href="<c:url value='/css/housesview/style.css'/>">
+    </head>
+    <body>
+    /
 <%-- Включаем в документ шапку из отдельного файла --%>
 <jsp:include page="../template/header.jsp" flush="false"/>
 
 <h1>${text_h1}</h1>
 
-<a href='/house/editable'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a></br>
+<a  href='http://localhost:8008/house/editable'><img title='Редактировать дом' src='<c:url value="/images/edit_32.png"/>'  width='16px'></a></br>
 <table  cellspacing="2" border="1" cellpadding="2" width="960">
     <tr>
         <th>Адрес</th>
@@ -34,9 +36,9 @@
                 <td>${house.floors}</td>
                 <td>${house.buildDate}</td>
                 <td>
-                    <a href='./apartments?houseId=${house.id}'><img src='./images/apartments_32.png' title='Список квартир' width='16px'></a>
-                    <a href='/house/editRow?id=${house.id}'><img src='./images/edit_32.png' title='Редактировать дом' width='16px'></a>
-                    <a href='/house/remove?id=${house.id}'><img src='./images/remove_32.png' title='Удалить дом' width='16px'></a>
+                    <a href='./apartments?houseId=${house.id}'><img src='<c:url value="/images/apartments_32.png"/>' title='Список квартир' width='16px'></a>
+                    <a href='/house/editRow?id=${house.id}'><img src='<c:url value="/images/edit_32.png"/>' title='Редактировать дом' width='16px'></a>
+                    <a href='/house/remove?id=${house.id}'><img src='<c:url value="/images/remove_32.png"/>' title='Удалить дом' width='16px'></a>
                 </td>
             </tr>
         </c:forEach>

@@ -34,7 +34,7 @@ public class HouseAddNew extends HttpServlet {
         HousesEntity newHouse = new HousesEntity(paramAddress, paramFloors, paramBuildDate);
         entityUtils.update(newHouse);
 
-        response.sendRedirect(response.encodeRedirectURL("/houseList"));
+        response.sendRedirect(response.encodeRedirectURL("/house/list"));
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

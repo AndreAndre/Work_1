@@ -7,7 +7,6 @@
 <a href="./houses?view=add">Дома (добавление)</a></br>
 <a href="./apartments">здесь недоделанная страничка.</a></br>
 
-<a href="./houseList">Новый список домов на Servlet + JSP</a></br>
 <a href="./house/list">Новый список домов на Servlet + JSP (/) </a></br>
 </body>
 </html>
